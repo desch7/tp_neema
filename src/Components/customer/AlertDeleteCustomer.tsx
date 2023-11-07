@@ -9,6 +9,7 @@ import { useState } from 'react';
 import React from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { deleteCustomer } from '../../services/customer/Api.ts';
 
 
 export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSuccess}) {
@@ -21,30 +22,21 @@ export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSucce
         onNotifmodal(false)
       }
 
-    const deleteCustomer = async () =>{
+    const deleteCustomerBut = () =>{
         setLoading(true)
-        await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/` + parseInt(idCustomer),
-            {
-                method: 'DELETE',
-            }
-        ).then(response => {
-            console.log(response)
-                if (!response.ok) {
-                    toast.error('Something went wrong!',
-                    {position: toast.POSITION.TOP_CENTER})
-                    
-                    setLoading(false)
-                    return
-                }
-                msgSuccess('Customer was deleted successfully')
-                setModal(false)
-                onNotifmodal(false)
-        }).catch(err => {
-                    console.log(err)
-                    toast.error('The server is not available!',
-                        {position: toast.POSITION.TOP_CENTER})
-                }
-        )
+        deleteCustomer(idCustomer).then(res => {
+          if (res === 'OK') {
+            msgSuccess('Customer was deleted successfully')
+            setModal(false)
+            onNotifmodal(false)
+          }else{
+            setLoading(false)
+            toast.error('The server is not available or something went wrong!',
+                {position: toast.POSITION.TOP_CENTER})
+                return
+          }
+        })
+        
     }
     
   return (
@@ -64,7 +56,7 @@ export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSucce
                   <LoadingButton
                   size="small"
                   color="error"
-                  onClick={deleteCustomer}
+                  onClick={deleteCustomerBut}
                   loading={loading}
                   loadingPosition="start"
                   startIcon={<DeleteIcon />}

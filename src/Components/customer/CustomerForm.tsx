@@ -9,13 +9,15 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useEffect, useState } from 'react';
 import React from 'react';
-import Input from './Input.tsx';
-import Select from './Select.tsx';
-import Checkbox from './Checkbox.tsx';
-import Textarea from './Textarea.tsx';
+import Input from '../Input.tsx';
+import Select from '../Select.tsx';
+import Checkbox from '../Checkbox.tsx';
+import Textarea from '../Textarea.tsx';
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { createCustomer, updateCustomer } from '../../services/customer/Api.ts';
+import { controlFields } from '../../utils/CustomerFieldsController.ts';
 
 
 
@@ -47,126 +49,61 @@ const listOptLang: optionsLanguage[] = [
 
     const { register, handleSubmit, setValue, formState:{ errors }} = useForm();
 
-    const onSubmit = async (data:any) => {
+    const onSubmit =  (data:any) => {
         setLoading(true)
         data.idCurrency = 272
         data.slug = parseInt(data.slug)
         data.terms = parseInt(data.terms)
         data.idCountry = 2
         data.isActive = false
+        data.isSubAgency = data.isSubAgency? data.isSubAgency : false;
         console.log(JSON.stringify(data))
         if (customer) {
             // Update customer
             const newRows = rows.filter(row =>row.id !== customer.id)
-            if (newRows.filter(row =>row.tmcClientNumber === data.tmcClientNumber).length > 0) {
-                toast.error('Fields TMC Client Number is already in use. Must be unique',
+            const fieldsCheck = controlFields(newRows, data)
+            if (fieldsCheck !== 'OK') {
+                toast.error(fieldsCheck,
                     {position: toast.POSITION.TOP_CENTER})
                 
                 setLoading(false)
                 return
             }
-            if (newRows.filter(row =>row.terms === data.terms).length > 0) {
-                toast.error('Fields Terms is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            if (newRows.filter(row =>row.alias === data.alias).length > 0) {
-                toast.error('Fields Alias is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            if (newRows.filter(row =>row.abKey === data.abKey).length > 0) {
-                toast.error('Fields Ab Key is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/` + customer.id,{
-                method: 'PUT',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            })
+            updateCustomer(data)
             .then((response) => {
-                console.log(response)
-                if (!response.ok) {
-                    toast.error('Something went wrong!',
+                if (response === 'OK') {  
+                    msgSuccess('Customer was updated successfully')
+                    setModal(false)
+                    onNotifmodal(false)
+                }else{
+                    toast.error('The server is not available or something went wrong!',
                     {position: toast.POSITION.TOP_CENTER})
-                    
                     setLoading(false)
-                    return
                 }
-                msgSuccess('Customer was updated successfully')
-                setModal(false)
-                onNotifmodal(false)
                  })
-            .catch((err) => {
-                console.log(err)
-                toast.error('The server is not available!',
-                    {position: toast.POSITION.TOP_CENTER})
-            })
 
         }else{
             //insert customer
-            if (rows.filter(row =>row.tmcClientNumber === data.tmcClientNumber).length > 0) {
-                toast.error('Fields TMC Client Number is already in use. Must be unique',
+            const fieldsCheck = controlFields(rows, data)
+            if (fieldsCheck !== 'OK') {
+                toast.error(fieldsCheck,
                     {position: toast.POSITION.TOP_CENTER})
                 
                 setLoading(false)
                 return
             }
-            if (rows.filter(row =>row.terms === data.terms).length > 0) {
-                toast.error('Fields Terms is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            if (rows.filter(row =>row.alias === data.alias).length > 0) {
-                toast.error('Fields Alias is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            if (rows.filter(row =>row.abKey === data.abKey).length > 0) {
-                toast.error('Fields Ab Key is already in use. Must be unique',
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
-            await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers`,{
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            })
+            createCustomer(data)
             .then((response) => {
-                console.log(response)
-                if (!response.ok) {
-                    toast.error('Something went wrong!',
+                if (response === 'OK') {  
+                    msgSuccess('Customer was created successfully')
+                    setModal(false)
+                    onNotifmodal(false)
+                }else{
+                    toast.error('The server is not available or something went wrong!',
                     {position: toast.POSITION.TOP_CENTER})
-                    
                     setLoading(false)
-                    return
                 }
-                msgSuccess('Customer was updated successfully')
-                setModal(false)
-                onNotifmodal(false)
                  })
-            .catch((err) => {
-                console.log(err)
-                toast.error('The server is not available!',
-                    {position: toast.POSITION.TOP_CENTER})
-            })
         }
 
     };
@@ -217,7 +154,7 @@ const listOptLang: optionsLanguage[] = [
                     {/* <Input id='IRSKey' placeholder='IRS Share Key'  label='IRS Share Key' type='text'/> */}
                 </div>
                 <div className='w-80 ml-3 mr-3'>
-                    <Checkbox id='isSubAgency' errors={errors} required={true} label='Sub-Agency' register={register} type='checkbox'/>
+                    <Checkbox id='isSubAgency' errors={errors}  label='Sub-Agency' register={register} type='checkbox'/>
                     <Input id='agency' placeholder='Agency' errors={errors} register={register} label='Agency' type='text'/>
                     <Input id='abKey' required={true} placeholder='Ab Key' errors={errors} register={register} label='Ab Key' type='text'/>
                     {/* <Input id='openingBl' placeholder='Opening Balance'  label='Opening Balance' type='text'/> */}
