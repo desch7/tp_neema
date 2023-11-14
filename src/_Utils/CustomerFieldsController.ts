@@ -1,4 +1,4 @@
-import CustomerModel from "../models/customer/CustomerModel.tsx"
+import CustomerModel from "../models/CustomerModel.tsx"
 
 export const controlFields = (newRows : CustomerModel[], customer : CustomerModel) => {
     let goodCustomer : string= 'OK'

@@ -1,0 +1,53 @@
+#admin {
+    display: flex;
+}
+
+.SideMenu{
+    flex-grow: 1;
+    border-right: solid 1px grey;    
+    margin-left: 20px;
+    padding-top: 20px;
+    margin-right: 0px;
+}
+
+#admin_body{
+    flex-grow: 6;
+    padding-left: 15px;
+}
+
+.AHeader{
+    text-align: center;
+    line-height: 50px;
+    background-color: grey;
+    color: white;
+}
+
+
+.SideMenu ul {
+    list-style: none;
+    margin: 5px;
+}
+
+.SideMenu ul li  {
+    padding: 15px;
+}
+
+.SideMenu ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+.SideMenu ul li:hover {
+    color: white;
+    background-color: grey;
+}
+
+.SideMenu ul li a:hover {
+    color: white;
+}
+
+.SideMenu ul li a:active {
+    color: white;
+    background-color: grey;
+}
+

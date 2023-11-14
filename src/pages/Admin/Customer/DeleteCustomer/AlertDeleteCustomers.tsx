@@ -5,47 +5,19 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelIcon from '@mui/icons-material/Cancel';
-import { useState } from 'react';
 import React from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deleteCustomer } from '../../services/customer/Api.ts';
 
 
-export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSuccess}) {
-
-    const [modal, setModal] = useState(true)
-    const [loading, setLoading] = useState(false)
-
-    const handleClose = () => { 
-        setModal(false)
-        onNotifmodal(false)
-      }
-
-    const deleteCustomerBut = () =>{
-        setLoading(true)
-        deleteCustomer(idCustomer).then(res => {
-          if (res === 'OK') {
-            msgSuccess('Customer was deleted successfully')
-            setModal(false)
-            onNotifmodal(false)
-          }else{
-            setLoading(false)
-            toast.error('The server is not available or something went wrong!',
-                {position: toast.POSITION.TOP_CENTER})
-                return
-          }
-        })
-        
-    }
-    
+const AlertDeleteCustomers = (props) => {
   return (
     <div>
      <ToastContainer/>
       <Dialog
-        maxHeight="100%"
-        open={modal}
-        onClose={handleClose}
+        //maxHeight="100%"
+        open={props.modal}
+        onClose={props.handleClose}
       >      
             <DialogContent>
              Do you want to delete this record?
@@ -56,8 +28,8 @@ export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSucce
                   <LoadingButton
                   size="small"
                   color="error"
-                  onClick={deleteCustomerBut}
-                  loading={loading}
+                  onClick={props.deleteCustomerBut}
+                  loading={props.loading}
                   loadingPosition="start"
                   startIcon={<DeleteIcon />}
                   variant="outlined"
@@ -69,9 +41,9 @@ export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSucce
                 <Button 
                 size="small" 
                 color="primary"
-                variant="outlined"//"contained"
+                variant="outlined"
                 startIcon={<CancelIcon />} 
-                onClick={handleClose}
+                onClick={props.handleClose}
                 >
                 Cancel
                 </Button>
@@ -81,4 +53,6 @@ export default function AlertDeleteCustomer({ onNotifmodal, idCustomer, msgSucce
     </div>
   );
 }
+
+export default AlertDeleteCustomers;
 

@@ -1,17 +1,17 @@
-import CustomerModel from "../../models/customer/CustomerModel.ts"
+import CustomerModel from "../models/CustomerModel.tsx"
 
 export const findAllCustomer = async () =>  {
     let allCustomer : CustomerModel[] = [];
 
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers`)
-                          .then(res => res.json())
-                          .then(data =>{
-                            allCustomer = data
-                            console.log('allCustomer => ',allCustomer)
-                          })
-                          .catch(err => {
-                            console.log('error fetch all customer=> ',err)
-                          })
+        .then(res => res.json())
+        .then(data =>{
+            allCustomer = data
+            console.log('allCustomer => ',allCustomer)
+        })
+        .catch(err => {
+            console.log('error fetch all customer=> ',err)
+        })
 
     return allCustomer;
 }
