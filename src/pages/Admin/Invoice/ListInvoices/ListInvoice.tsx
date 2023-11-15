@@ -9,58 +9,78 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { findAllInvoice } from "../../../../_service/invoice_service.tsx";
 import InvoiceModel from "../../../../models/InvoiceModel.tsx";
-import DataTable from "./ListInvoiceForm.tsx";
+import DataTable from "./DataTable.tsx";
+import PaymentIcon from '@mui/icons-material/Payment';
 
 
 const ListInvoice = () => {
 
     const columns: GridColDef[] = [
         { 
-          field: "invoiceName",  headerName: "Invoice Name", 
+          field: "invoice_number",  headerName: "Invoice Number", 
           width: 200, align: 'left', headerAlign: 'left', 
         },
         { 
-          field: "accountNumber",  headerName: "Account Number", 
+          field: "creationDate",  headerName: "Creation Date", 
           width: 150, align: 'left', headerAlign: 'left', 
         },
         {
-          field: "state", headerName: "State",
+          field: "dueDate", headerName: "Due Date", 
+          width: 150, align: 'left', headerAlign: 'left',
+        },
+        {
+          field: "amount", headerName: "Amount",
           width: 170, align: 'left', headerAlign: 'left',
         },
         {
-          field: "city", headerName: "City",
+          field: "balance", headerName: "Balance",
           width: 170, align: 'left', headerAlign: 'left',
         },
         {
-          field: "zipCode", headerName: "Zip Code",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "agency", headerName: "Agency",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "tmcClientNumber", headerName: "TMC Client Number",
-          width: 200, align: 'left', headerAlign: 'left',
+          field: "credit_apply", headerName: "Apply Credit",
+          width: 150, align: 'left', headerAlign: 'left',
         },
         {
           field: "actions", type: "actions", headerName: "Actions",
-          width: 100, cellClassName: "actions",
+          width: 150, cellClassName: "actions", align: 'center', 
           getActions: ({id}) => {
             return [
+              <div className="flex ">
+                <div className="w-12">
+                  <GridActionsCellItem
+                  icon={<EditIcon />} label="Edit" className="textPrimary"
+                  onClick={displayModalUpdate(id)} color="inherit" 
+                  />
+                </div>
+              <div className="w-12">  
               <GridActionsCellItem
-                icon={<EditIcon />} label="Edit" className="textPrimary"
-                onClick={displayModalUpdate(id)} color="inherit"
-              />,
+                icon={<PaymentIcon />}
+                label="Imputation"
+                //onClick={deleteCustomer(id)}
+                color="inherit"
+              />
+              </div>
+              <div className="w-12">
               <GridActionsCellItem
                 icon={<DeleteIcon />} label="Delete"
                 onClick={deleteInvoice(id)} color="inherit"
               />
+              </div>
+              </div>       
             ];
           }
         }
       ];
-    
+      const [paginationModel, setPaginationModel] = useState({
+        page: 0,
+        pageSize: 25,
+      });
+      // request for pagination from backend
+      //const { isLoading, rows, totalRowCount } = useQuery(paginationModel);
+
+      // const [rowCountState, setRowCountState] = useState(
+      //   totalRowCount || 0,
+      // );
       const [rows, setRows] = useState<InvoiceModel[]>([])
       const [rowSelectionModel, setRowSelectionModel] = useState<
           GridRowSelectionModel   >([]);
@@ -99,19 +119,48 @@ const ListInvoice = () => {
       }
     
       useEffect(() => {
-        findAllInvoice().then(data => setRows(data))
+        findAllInvoice(paginationModel).then(data => setRows(data))
       }, [relaodData]);
+
+      // useEffect(() => {
+      //   setRowCountState((prevRowCountState) =>
+      //     totalRowCount !== undefined
+      //       ? totalRowCount
+      //       : prevRowCountState,
+      //   );
+      // }, [totalRowCount, setRowCountState]);
+
+      const fakeRows = [  
+        {
+          id:0,
+          invoice_number: "INV-001", //string (generated from backend)
+          idCustomer:0, //integer
+          creationDate:"2022-09-09", // date in this format
+          dueDate:"2022-10-19", //date in this format,
+          amount:10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
+          status:"", //string
+          balance:0.00, //float
+          credit_apply:0.00, //float
+        }
+      ]
     
       return (
-        <DataTable 
+        <div>
+          <DataTable 
           openModal={openModal} onNotifmodal={onNotifmodal} 
           invoice={invoice}  msgSuccess={msgSuccess} 
-          rows={rows} idInvoiceToDel = {idInvoiceToDel}
+          rows={fakeRows} idInvoiceToDel = {idInvoiceToDel}
           displayModal={displayModal} columns={columns} 
           rowSelectionModel={rowSelectionModel}
           openModalDelete={openModalDelete} 
           setRowSelectionModel={setRowSelectionModel}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          //rowCount={rowCountState}
+          //loading={isLoading}
         />
+        </div>
+        
       );
 }
 

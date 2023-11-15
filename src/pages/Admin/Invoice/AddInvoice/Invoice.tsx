@@ -119,13 +119,16 @@ const listOptLang: optionsLanguage[] = [
 
 
   return (
-    <InvoiceForms 
-      modal={modal} handleClose={handleClose} 
-      handleSubmit={handleSubmit} errors={errors}
-      onSubmit={onSubmit} register = {register}
-      listOptLang={listOptLang} loading={loading} 
-      invoice={invoice}
-    />
+    <div>
+        <InvoiceForms 
+        modal={modal} handleClose={handleClose} 
+        handleSubmit={handleSubmit} errors={errors}
+        onSubmit={onSubmit} register = {register}
+        listOptLang={listOptLang} loading={loading} 
+        invoice={invoice}
+        />
+    </div>
+    
   );
 }
 

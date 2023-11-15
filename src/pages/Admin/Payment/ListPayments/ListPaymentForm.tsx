@@ -34,12 +34,13 @@ const ListPaymentForm = (props) => {
       <h3 className="flex justify-center text-2x font-bold mb-10 mb-top">
         PAYMENTS LIST
       </h3>
-      <Button color="primary" variant= "outlined" 
-        startIcon={<AddIcon />} onClick={props.displayModal}
-      >
-        Add Payment
-      </Button>
-      <span className='mr-3'></span>
+      <div className="w-1/6">
+        <Button color="primary" variant= "outlined" 
+          startIcon={<AddIcon />} onClick={props.displayModal}
+        >
+          Add Payment
+        </Button>
+      </div>
       <div className="mt-2 " style={{ height: 370, width: '100%' }}>
         <DataGrid
           rows={props.rows}

@@ -1,12 +1,14 @@
-import InvoiceModel from "../models/InvoiceModel"
+//import InvoiceModel from "../models/InvoiceModel.ts"
 
-export const findAllInvoice = async () =>  {
+import InvoiceModel from "../models/InvoiceModel";
+
+export const findAllInvoice = async ({page, pageSize}) =>  {
     let allInvoice : InvoiceModel[] = [];
 
-     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices`)
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices?page=${page}&page-size=${pageSize}`)
         .then(res => res.json())
-        .then(data =>{
-            allInvoice = data
+        .then(resp =>{
+            allInvoice = resp
             console.log('allInvoice => ',allInvoice)
         })
         .catch(err => {

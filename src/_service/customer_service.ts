@@ -1,4 +1,4 @@
-import CustomerModel from "../models/CustomerModel.tsx"
+import CustomerModel from "../models/CustomerModel.ts"
 
 export const findAllCustomer = async () =>  {
     let allCustomer : CustomerModel[] = [];

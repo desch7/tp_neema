@@ -21,15 +21,15 @@ const InvoiceForms = (props) => {
     <div>
      <ToastContainer />
       <Dialog
-        //maxWidth="100%"
+      fullScreen
         open={props.modal}
         onClose={props.handleClose}
       >
         <DialogTitle className='flex justify-center bg-slate-100'>
           New Invoice
         </DialogTitle>
-        <form onSubmit={props.handleSubmit(props.onSubmit)}>       
-            <DialogContent>
+        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>       
+            <DialogContent className=''>
               <div className='flex justify-around'>
                 <div className='w-80 mr-3'>
                     <Input id='invoiceName' errors={props.errors} 
@@ -104,7 +104,7 @@ const InvoiceForms = (props) => {
               </div>
             </DialogContent>
             <div className='flex justify-center bg-slate-100'>         
-              <DialogActions>
+              <DialogActions className=''>
                 <div className='mr-10'>
                   <LoadingButton
                   size="small"

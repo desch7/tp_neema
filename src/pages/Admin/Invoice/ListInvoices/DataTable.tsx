@@ -8,7 +8,7 @@ import Invoice from '../AddInvoice/Invoice.tsx';
 import DeleteInvoice from '../DeleteInvoice/DeleteInvoice.tsx';
 
 
-const ListInvoiceForm = (props) => {
+const DataTable = (props) => {
   return (
     <div className="p-4">
       <ToastContainer />
@@ -31,31 +31,33 @@ const ListInvoiceForm = (props) => {
         </div>
       )}
     
-      <h3 className="flex justify-center text-2x font-bold mb-10 mb-top">
+      <h3 className="flex justify-center text-2x font-bold mb-3">
         INVOICES LIST
       </h3>
-      <Button color="primary" variant= "outlined" 
-        startIcon={<AddIcon />} onClick={props.displayModal}
-      >
-        Add Invoice
-      </Button>
-      <span className='mr-3'></span>
-      <div className="mt-2 " style={{ height: 370, width: '100%' }}>
+      <div className="w-1/6">
+        <Button color="primary" variant= "outlined" 
+          startIcon={<AddIcon />} onClick={props.displayModal}
+        >
+          Add Invoice
+        </Button>
+      </div>
+      
+      <div className="mt-2" style={{ height: 525, width: '100%' }}>
         <DataGrid
           rows={props.rows}
           columns={props.columns}
-          editMode="row"
-          checkboxSelection
+          rowCount={props.rowCount}
+          loading={props.loading}
           onRowSelectionModelChange={(newRowSelectionModel) => {
+            console.log(newRowSelectionModel);
+            
             props.setRowSelectionModel(newRowSelectionModel);
           }}
           rowSelectionModel={props.rowSelectionModel}
-          initialState={{
-            pagination: {
-              paginationModel: {  page: 0, pageSize: 5 }
-            }
-          }}
-          pageSizeOptions={[5, 10, 20]}
+          pageSizeOptions={[20]}
+          paginationModel={props.paginationModel}
+          paginationMode="server"
+          onPaginationModelChange={props.setPaginationModel}
         />
       </div>     
     </div>
@@ -63,4 +65,4 @@ const ListInvoiceForm = (props) => {
 }
 
 
-export default ListInvoiceForm;
+export default DataTable;

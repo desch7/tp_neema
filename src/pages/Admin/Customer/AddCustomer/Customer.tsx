@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createCustomer, updateCustomer } from '../../../../_service/customer_service.tsx';
+import { createCustomer, updateCustomer } from '../../../../_service/customer_service.ts';
 import CustomerForms from './CustomerForms.tsx';
 import { controlFields } from '../../../../_Utils/CustomerFieldsController.ts';
 

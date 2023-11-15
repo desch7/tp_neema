@@ -7,7 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { findAllCustomer } from "../../../../_service/customer_service.tsx";
+import { findAllCustomer } from "../../../../_service/customer_service.ts";
 import CustomerModel from "../../../../models/CustomerModel.ts";
 import DataTable from "./ListCustomerForm.tsx";
 
@@ -17,7 +17,7 @@ const ListCustomer = () => {
     const columns: GridColDef[] = [
         { 
           field: "customerName",  headerName: "Customer Name", 
-          width: 200, align: 'left', headerAlign: 'left', 
+          width: 250, align: 'left', headerAlign: 'left', 
         },
         { 
           field: "accountNumber",  headerName: "Account Number", 
@@ -25,15 +25,7 @@ const ListCustomer = () => {
         },
         {
           field: "state", headerName: "State",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "city", headerName: "City",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "zipCode", headerName: "Zip Code",
-          width: 170, align: 'left', headerAlign: 'left',
+          width: 200, align: 'left', headerAlign: 'left',
         },
         {
           field: "agency", headerName: "Agency",
@@ -45,7 +37,7 @@ const ListCustomer = () => {
         },
         {
           field: "actions", type: "actions", headerName: "Actions",
-          width: 100, cellClassName: "actions",
+          width: 150, cellClassName: "actions", align: 'left',
           getActions: ({id}) => {
             return [
               <GridActionsCellItem

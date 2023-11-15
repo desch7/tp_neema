@@ -2,7 +2,7 @@ import { useState } from 'react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deleteCustomer } from '../../../../_service/customer_service.tsx';
+import { deleteCustomer } from '../../../../_service/customer_service.ts';
 import AlertDeleteCustomers from './AlertDeleteCustomers.tsx';
 
 
