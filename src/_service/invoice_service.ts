@@ -1,6 +1,6 @@
 //import InvoiceModel from "../models/InvoiceModel.ts"
 
-import InvoiceModel from "../models/InvoiceModel";
+import InvoiceModel from "../models/InvoiceModel.ts";
 
 export const findAllInvoice = async ({page, pageSize}) =>  {
     let allInvoice : InvoiceModel[] = [];
@@ -8,11 +8,27 @@ export const findAllInvoice = async ({page, pageSize}) =>  {
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices?page=${page}&page-size=${pageSize}`)
         .then(res => res.json())
         .then(resp =>{
-            allInvoice = resp
+            allInvoice = resp.data
             console.log('allInvoice => ',allInvoice)
         })
         .catch(err => {
             console.log('error fetch all invoice=> ',err)
+        })
+
+    return allInvoice;
+}
+
+export const findAllInvoiceByCustomer = async ({page, pageSize}, idCustomer) =>  {
+    let allInvoice : any[] = [];
+
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices?embed=${idCustomer}&page=${page}&page-size=${pageSize}`)
+        .then(res => res.json())
+        .then(resp =>{
+            allInvoice = resp.data
+            console.log('all Invoice by customer=> ',allInvoice)
+        })
+        .catch(err => {
+            console.log('error fetch all Invoice by customer=> ',err)
         })
 
     return allInvoice;

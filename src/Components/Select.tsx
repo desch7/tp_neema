@@ -13,6 +13,7 @@ interface SelectProps {
     required?: boolean,
     register: any,
     errors: any,
+    onChangeSelect?: any,
 
 }
 
@@ -23,13 +24,18 @@ const Select:React.FC<SelectProps> = ({
     required,
     register,
     errors,
+    onChangeSelect,
 }) => {
+    // const onChangeSelect = (e) => {
+    //     console.log('Change');
+    //     console.log(e.target.value)
+    // }
     return (
         <div>
             <label className="block text-sm font-medium leading-6 text-gray-900" htmlFor={id}>{label}<span className="text-red-500">{required? '*' : ''}</span></label>
             {required? <>
                 <select id={id} {...register(id, {required : 'This is required'})} 
-                 
+                  onChange={(e) => onChangeSelect(e)}
             className={clsx(`
                 form-input
                 block
@@ -59,7 +65,7 @@ const Select:React.FC<SelectProps> = ({
             {errors[id] && <p className="text-red-500">{errors[id]?.message}</p>}
             </> : <>
             <select id={id} {...register(id)} 
-                 
+                 onChange={(e) => onChangeSelect(e)}
                  className={clsx(`
                      form-input
                      block

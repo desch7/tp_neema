@@ -1,12 +1,12 @@
-import PaymentModel from "../models/PaymentModel"
+import PaymentModel from "../models/PaymentModel.ts"
 
-export const findAllPayment = async () =>  {
+export const findAllPayment = async ({page, pageSize}) =>  {
     let allPayment : PaymentModel[] = [];
 
-     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments`)
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments?page=${page}&page-size=${pageSize}`)
         .then(res => res.json())
-        .then(data =>{
-            allPayment = data
+        .then(resp =>{
+            allPayment = resp.data
             console.log('allPayment => ',allPayment)
         })
         .catch(err => {
@@ -19,7 +19,7 @@ export const findAllPayment = async () =>  {
 
 export  const deletePayment = async (idPayment: number) =>{
     let message : string = '';
-    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/` + idPayment,
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/${idPayment}` ,
         {
             method: 'DELETE',
         }
@@ -39,8 +39,8 @@ export  const deletePayment = async (idPayment: number) =>{
 
 export const updatePayment = async (payment : PaymentModel) => {
     let message : string = '';
-    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/` + payment.id,{
-        method: 'PUT',
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/${payment.id}`,{
+        method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },
@@ -79,6 +79,22 @@ export const createPayment = async (payments : PaymentModel) => {
 
 
     return message
+}
+
+export const selectPayment = async (paymentId : number) => {
+    let payment : any = {}
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/${paymentId}`)
+    .then(res => res.json())
+        .then(resp =>{
+            payment = resp
+            console.log('Payment by id => ',payment)
+        })
+        .catch(err => {
+            console.log('error fetch Payment by id=> ',err)
+        })
+
+
+    return payment
 }
 
         

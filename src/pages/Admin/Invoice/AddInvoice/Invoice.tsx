@@ -4,14 +4,61 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createInvoice, updateInvoice } from '../../../../_service/invoice_service.tsx';
+import { createInvoice, updateInvoice } from '../../../../_service/invoice_service.ts';
 import { controlFields } from '../../../../_Utils/InvoiceFieldsController.ts';
 import InvoiceForms from './InvoiceForms.tsx';
+import {
+    GridRowSelectionModel, GridColDef, GridActionsCellItem,
+  } from "@mui/x-data-grid";
 
 
 
 export default function Invoice({ onNotifmodal, invoice, rows, msgSuccess}) {
 
+    const columns: GridColDef[] = [
+        { 
+          field: "invoice_number",  headerName: "Invoice Number", 
+          width: 200, align: 'left', headerAlign: 'left', 
+        },
+        { 
+          field: "creationDate",  headerName: "Creation Date", 
+          width: 150, align: 'left', headerAlign: 'left', 
+        },
+        {
+          field: "dueDate", headerName: "Due Date", 
+          width: 150, align: 'left', headerAlign: 'left',
+        },
+        {
+          field: "amount", headerName: "Amount",
+          width: 170, align: 'left', headerAlign: 'left',
+        },
+        {
+          field: "balance", headerName: "Balance",
+          width: 170, align: 'left', headerAlign: 'left',
+        },
+        {
+          field: "credit_apply", headerName: "Apply Credit",
+          width: 150, align: 'left', headerAlign: 'left',
+        },
+    
+      ];
+
+      const fakeRows = [  
+        {
+          id:0,
+          invoice_number: "INV-001", //string (generated from backend)
+          idCustomer:0, //integer
+          creationDate:"2022-09-09", // date in this format
+          dueDate:"2022-10-19", //date in this format,
+          amount:10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
+          status:"", //string
+          balance:0.00, //float
+          credit_apply:0.00, //float
+        }
+      ]
+      const [rowSelectionModel, setRowSelectionModel] = useState<
+      GridRowSelectionModel
+    >([]);
    const [modal, setModal] = useState(true)
    const [loading, setLoading] = useState(false)
 
@@ -124,8 +171,10 @@ const listOptLang: optionsLanguage[] = [
         modal={modal} handleClose={handleClose} 
         handleSubmit={handleSubmit} errors={errors}
         onSubmit={onSubmit} register = {register}
-        listOptLang={listOptLang} loading={loading} 
-        invoice={invoice}
+        listOptLang={listOptLang} loading={loading}
+        listOptCustomer = {listOptLang} rows={fakeRows}
+        invoice={invoice} columns={columns} checkboxSelection = {true}
+        setRowSelectionModel = {setRowSelectionModel}
         />
     </div>
     

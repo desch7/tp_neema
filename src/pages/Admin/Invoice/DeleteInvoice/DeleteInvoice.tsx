@@ -2,7 +2,7 @@ import { useState } from 'react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deleteInvoice } from '../../../../_service/invoice_service.tsx';
+import { deleteInvoice } from '../../../../_service/invoice_service.ts';
 import AlertDeleteInvoices from './AlertDeleteInvoices.tsx';
 
 

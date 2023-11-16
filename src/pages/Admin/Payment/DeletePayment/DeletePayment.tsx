@@ -2,7 +2,7 @@ import { useState } from 'react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deletePayment } from '../../../../_service/payment_service.tsx';
+import { deletePayment } from '../../../../_service/payment_service.ts';
 import AlertDeletePayments from './AlertDeletePayments.tsx';
 
 

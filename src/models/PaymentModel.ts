@@ -1,23 +1,13 @@
 type PaymentModel = {
-    id : number,
-    customerName : string,
-    street : string,           
-    city : string
-    state : string
-    zipCode : string
-    notes : string
-    terms : number,
-    accountNumber : string,
-    isSubAgency : boolean
-    language : string
-    slug : number,
-    agency : string,
-    alias : string,
-    abKey : string
-    tmcClientNumber : string,
-    idCurrency : number,
-    idCountry : number,
-    isActive : boolean,
+    id:number,
+    paymentNumber: string, //string (generated from backend)
+    idCustomer:number, //integer
+    paymentDate:string, // date in this format
+    paymentMode:string, //date in this format,
+    amount:number, //float. ---> SUM of total price of all travel_item linked to invoice
+    balance:number, //string
+    usedAmount:number, //float
+    status:string, //float
 }
 
 export default PaymentModel

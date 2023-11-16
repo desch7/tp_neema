@@ -26,7 +26,7 @@ const CustomerForms = (props) => {
         onClose={props.handleClose}
       >
         <DialogTitle className='flex justify-center bg-slate-100'>
-          New Customer
+        {props.payment? 'Edit Customer' : 'New Customer'} 
         </DialogTitle>
         <form onSubmit={props.handleSubmit(props.onSubmit)}>       
             <DialogContent>

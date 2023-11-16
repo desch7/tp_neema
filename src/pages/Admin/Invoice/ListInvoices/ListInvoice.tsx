@@ -7,10 +7,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { findAllInvoice } from "../../../../_service/invoice_service.tsx";
+import { findAllInvoice } from "../../../../_service/invoice_service.ts";
 import InvoiceModel from "../../../../models/InvoiceModel.tsx";
-import DataTable from "./DataTable.tsx";
 import PaymentIcon from '@mui/icons-material/Payment';
+import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Invoice from '../AddInvoice/Invoice.tsx';
+import DeleteInvoice from '../DeleteInvoice/DeleteInvoice.tsx';
+import DataTable from '../../../../Components/DataTable.tsx';
 
 
 const ListInvoice = () => {
@@ -145,22 +151,55 @@ const ListInvoice = () => {
       ]
     
       return (
+        <div className="p-4">
+      <ToastContainer />
+      {openModal && (
         <div>
-          <DataTable 
-          openModal={openModal} onNotifmodal={onNotifmodal} 
-          invoice={invoice}  msgSuccess={msgSuccess} 
-          rows={fakeRows} idInvoiceToDel = {idInvoiceToDel}
-          displayModal={displayModal} columns={columns} 
+          <Invoice 
+            onNotifmodal={onNotifmodal}  invoice={invoice}  
+            msgSuccess={msgSuccess}  rows={rows}
+          />
+        </div>
+      )}
+
+      {openModalDelete && (
+        <div>
+          <DeleteInvoice 
+            onNotifmodal={onNotifmodal} 
+            idInvoice = {idInvoiceToDel} 
+            msgSuccess={msgSuccess}
+          />
+        </div>
+      )}
+    
+      <h3 className="flex justify-center text-2x font-bold mb-3">
+        INVOICES LIST
+      </h3>
+      <div className="w-1/6">
+        <Button color="primary" variant= "outlined" 
+          startIcon={<AddIcon />} onClick={displayModal}
+        >
+          Add Invoice
+        </Button>
+      </div>
+      
+      <div className="mt-2" style={{ height: 525, width: '100%' }}>
+        <DataTable
+          rows={fakeRows}
+          columns={columns}
+          //rowCount={rowCount}
+          //loading={loading}
           rowSelectionModel={rowSelectionModel}
-          openModalDelete={openModalDelete} 
-          setRowSelectionModel={setRowSelectionModel}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
           //rowCount={rowCountState}
           //loading={isLoading}
+          checkboxSelection = {false}
+          rowHeight={30}
+          setRowSelectionModel = {setRowSelectionModel}
         />
-        </div>
-        
+      </div>     
+    </div>
       );
 }
 

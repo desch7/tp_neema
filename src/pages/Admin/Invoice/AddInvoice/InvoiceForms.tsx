@@ -10,10 +10,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import React from 'react';
 import Input from '../../../../Components/Input.tsx';
 import Select from '../../../../Components/Select.tsx';
-import Checkbox from '../../../../Components/Checkbox.tsx';
-import Textarea from '../../../../Components/Textarea.tsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DataTable from '../../../../Components/DataTable.tsx';
 
 
 const InvoiceForms = (props) => {
@@ -31,77 +30,38 @@ const InvoiceForms = (props) => {
         <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>       
             <DialogContent className=''>
               <div className='flex justify-around'>
-                <div className='w-80 mr-3'>
-                    <Input id='invoiceName' errors={props.errors} 
+                <div className='w-80'>
+                    <Select id='idCustomer' errors={props.errors} 
                       required={true} register={props.register} 
-                      label='Invoice Name' type='text'
-                      placeholder='Invoice Name' 
+                      label='Customer Account' optionsList={props.listOptCustomer} 
                     />
-                    <Input id='accountNumber' errors={props.errors} 
-                      placeholder='Account Number' type='text'
-                      register={props.register}  label='Account Number' 
-                    />
-                    <Input id='terms' placeholder='Terms' 
-                      errors={props.errors}  label='Terms'  
-                      register={props.register} type='number'
-                    />
-                    <Input id='tmcClientNumber' required={true} 
-                      placeholder='TCM Client Number'  type='text'
-                      errors={props.errors}  register={props.register} 
-                      label='TCM Client Number'
-                    />
-                    <Input id='slug' placeholder='Slug' 
-                      errors={props.errors} register={props.register} 
-                      required={true} label='Slug' 
-                      type='number'
-                    />
+                    
                 </div>
-                <div className='w-80 ml-3 mr-3'>
-                    <Checkbox id='isSubAgency' errors={props.errors}  
-                      label='Sub-Agency' register={props.register} 
-                      type='checkbox'
-                    />
-                    <Input id='agency' placeholder='Agency' 
-                      errors={props.errors} register={props.register} 
-                      label='Agency' type='text'
-                    />
-                    <Input id='abKey' required={true} 
-                      placeholder='Ab Key' errors={props.errors}
-                      register={props.register} label='Ab Key' 
-                      type='text'
-                    />
-                    <Input id='alias' required={true} 
-                      placeholder='Alias' errors={props.errors} 
-                      register={props.register} label='Alias'
-                    />
-                    <Textarea id='notes' errors={props.errors} 
-                      placeholder='Notes' register={props.register} 
-                      label='Notes'
-                    />
-                </div>
-                <div className='w-80 ml-3'>
-                    <Input id='street' placeholder='Street' 
-                      errors={props.errors} register={props.register} 
-                      label='Street' type='text'
-                    />
-                    <Input id='city' placeholder='City' 
-                      errors={props.errors} register={props.register} 
-                      label='City' type='text'
-                    />
-                    <Input id='state' placeholder='State'
-                      errors={props.errors} register={props.register} 
-                      label='State' type='text'
-                    />
-                    <Input id='zipCode' placeholder='Zip Code'
-                      errors={props.errors}  register={props.register} 
-                      label='Zip Code' type='text'
-                    />
-                    <Select id='language' label='Language' 
-                      errors={props.errors} register={props.register} 
-                      optionsList={props.listOptLang}
+                <div className='w-80'>
+                    <Input id='dueDate'  
+                      errors={props.errors} required={true} label='Due Date'  
+                      register={props.register} type='date'
                     />
                 </div>
               </div>
+
+              <div className="mt-5 ml-16 mb-4" style={{ height: 430, width: '91%' }}>
+              Add Travel Items
+               <DataTable
+                 rows={props.rows}
+                 columns={props.columns}
+                 //rowCount={rowCount}
+                 //loading={loading}
+                 rowSelectionModel={props.rowSelectionModel}
+                 paginationModel={props.paginationModel}
+                 onPaginationModelChange={props.setPaginationModel}
+                 //rowCount={rowCountState}
+                 //loading={isLoading}
+                 checkboxSelection = {props.checkboxSelection}
+                 setRowSelectionModel = {props.setRowSelectionModel}
+                 rowHeight={30}
+               />
+              </div> 
             </DialogContent>
             <div className='flex justify-center bg-slate-100'>         
               <DialogActions className=''>
@@ -130,7 +90,7 @@ const InvoiceForms = (props) => {
               </DialogActions>
             </div>
         </form>
-      </Dialog>
+      </Dialog> 
     </div>
   );
 }
