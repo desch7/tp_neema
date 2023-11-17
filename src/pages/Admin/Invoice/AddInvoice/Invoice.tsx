@@ -4,16 +4,25 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createInvoice, updateInvoice } from '../../../../_service/invoice_service.ts';
+import { createInvoice, selectInvoice, updateInvoice } from '../../../../_service/invoice_service.ts';
 import { controlFields } from '../../../../_Utils/InvoiceFieldsController.ts';
 import InvoiceForms from './InvoiceForms.tsx';
 import {
     GridRowSelectionModel, GridColDef, GridActionsCellItem,
   } from "@mui/x-data-grid";
+  import { findAllCustomer } from '../../../../_service/customer_service.ts';
+  import { CreationSelectionList } from '../../../../_Utils/CreationSelectionList.ts';
+import InvoiceModel from '../../../../models/InvoiceModel.ts';
+import TravelItems from '../../../../models/TravelItems.ts';
 
 
 
-export default function Invoice({ onNotifmodal, invoice, rows, msgSuccess}) {
+export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
+
+  interface optionsSelect {
+    label: string,
+    value: number,
+}
 
     const columns: GridColDef[] = [
         { 
@@ -61,50 +70,33 @@ export default function Invoice({ onNotifmodal, invoice, rows, msgSuccess}) {
     >([]);
    const [modal, setModal] = useState(true)
    const [loading, setLoading] = useState(false)
+   const [listOptCustomer, setListOptCustomer] = useState<optionsSelect[]>([])
+   const [invoice, setInvoice] = useState<InvoiceModel>()
+   const [travelItemsRows, setTravelItemsRows] = useState<TravelItems[]>([])
+   const [custId, setCustId] = useState<number>()
 
   const handleClose = () => { 
     setModal(false)
     onNotifmodal(false)
   }
 
-  interface optionsLanguage {
-    label: string,
-    value: string,
-}
-
-const listOptLang: optionsLanguage[] = [
-    {
-        label: 'Francais',
-        value: 'fr'
-    },
-    {
-        label: 'English',
-        value: 'en'
-    }
-]
 
     const { register, handleSubmit, setValue, formState:{ errors }} = useForm();
 
     const onSubmit =  (data:any) => {
-        setLoading(true)
-        data.idCurrency = 272
-        data.slug = parseInt(data.slug)
-        data.terms = parseInt(data.terms)
-        data.idCountry = 2
-        data.isActive = false
-        data.isSubAgency = data.isSubAgency? data.isSubAgency : false;
-        console.log(JSON.stringify(data))
-        if (invoice) {
+      data.idCustomer = custId
+      setLoading(true)
+      let crtlFields = controlFields(data, rowSelectionModel)
+        if (invoiceId) {
             // Update invoice
-            const newRows = rows.filter(row =>row.id !== invoice.id)
-            const fieldsCheck = controlFields(newRows, data)
-            if (fieldsCheck !== 'OK') {
-                toast.error(fieldsCheck,
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
+            if (crtlFields !== 'OK' ) {
+              toast.error(crtlFields,
+                  {position: toast.POSITION.TOP_CENTER})
+              
+              setLoading(false)
+              return
+          }
+          console.log(JSON.stringify(data))
             updateInvoice(data)
             .then((response) => {
                 if (response === 'OK') {  
@@ -120,14 +112,22 @@ const listOptLang: optionsLanguage[] = [
 
         }else{
             //insert invoice
-            const fieldsCheck = controlFields(rows, data)
-            if (fieldsCheck !== 'OK') {
-                toast.error(fieldsCheck,
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
+            console.log('data.IdCustomer ', data.IdCustomer);
+            
+            if (crtlFields !== 'OK' ) {
+              toast.error(crtlFields,
+                  {position: toast.POSITION.TOP_CENTER})
+              
+              setLoading(false)
+              return
+          }
+        console.log('rowSelectionModel ', rowSelectionModel);
+        
+        let travelItemsSelected = travelItemsRows.filter(travelItem => rowSelectionModel.includes(travelItem.id))
+         data.travelItems = travelItemsSelected;
+          
+        console.log(JSON.stringify(data))
+
             createInvoice(data)
             .then((response) => {
                 if (response === 'OK') {  
@@ -144,25 +144,23 @@ const listOptLang: optionsLanguage[] = [
 
     };
 
+    const onChangeSelect = (e) => {
+      //console.log('Onchange launched ', e.target.value);
+      setCustId(e.target.value)
+  } 
+
     useEffect(() => {
-        if (invoice) {
-            setValue("invoiceName", invoice.invoiceName)
-            setValue("street", invoice.street)            
-            setValue("city", invoice.city)
-            setValue("state", invoice.state)
-            setValue("zipCode", invoice.zipCode)
-            setValue("notes", invoice.notes)
-            setValue("terms", invoice.terms)
-            setValue("accountNumber", invoice.accountNumber)
-            setValue("isSubAgency", invoice.isSubAgency)
-            setValue("language", invoice.language)
-            setValue("slug", invoice.slug)
-            setValue("agency", invoice.agency)
-            setValue("alias", invoice.alias)
-            setValue("abKey", invoice.abKey)
-            setValue("tmcClientNumber", invoice.tmcClientNumber)           
+      findAllCustomer()
+        .then(data => 
+            setListOptCustomer(CreationSelectionList({rows: data, value : 'id', label : 'customerName'}))
+        )
+        if (invoiceId) {
+           selectInvoice(invoiceId).then(invoice => setInvoice(invoice))
+            setValue("idCustomer", invoice?.idCustomer)
+            setValue("dueDate", invoice?.dueDate)                   
         }
-    }, [invoice])
+        
+    }, [invoiceId])
 
 
   return (
@@ -171,10 +169,10 @@ const listOptLang: optionsLanguage[] = [
         modal={modal} handleClose={handleClose} 
         handleSubmit={handleSubmit} errors={errors}
         onSubmit={onSubmit} register = {register}
-        listOptLang={listOptLang} loading={loading}
-        listOptCustomer = {listOptLang} rows={fakeRows}
+        loading={loading}
+        listOptCustomer = {listOptCustomer} rows={fakeRows}
         invoice={invoice} columns={columns} checkboxSelection = {true}
-        setRowSelectionModel = {setRowSelectionModel}
+        setRowSelectionModel = {setRowSelectionModel} onChangeSelect={onChangeSelect}
         />
     </div>
     

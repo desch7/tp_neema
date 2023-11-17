@@ -68,6 +68,11 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess}) {
     value: string,
 }
 
+interface optionsSelectCus {
+  label: string,
+  value: number,
+}
+
 const listOptpayMode: optionsSelect[] = [
     {
         label: 'cash',
@@ -82,7 +87,7 @@ const listOptpayMode: optionsSelect[] = [
         value: 'bank_tranfer'
     }
 ]
-const [listOptCustomer, setListOptCustomer] = useState<optionsSelect[]>([])
+const [listOptCustomer, setListOptCustomer] = useState<optionsSelectCus[]>([])
  
 
     const { register, handleSubmit, setValue, formState:{ errors }} = useForm();

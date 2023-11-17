@@ -18,6 +18,22 @@ export const findAllInvoice = async ({page, pageSize}) =>  {
     return allInvoice;
 }
 
+export const selectInvoice = async (invoiceId) => {
+    let Invoice : any = {};
+
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices/${invoiceId}`)
+        .then(res => res.json())
+        .then(resp =>{
+            Invoice = resp
+            console.log('allInvoice => ',Invoice)
+        })
+        .catch(err => {
+            console.log('error fetch invoice=> ',err)
+        })
+
+    return Invoice;
+}
+
 export const findAllInvoiceByCustomer = async ({page, pageSize}, idCustomer) =>  {
     let allInvoice : any[] = [];
 
@@ -57,8 +73,8 @@ export  const deleteInvoice = async (idInvoice: number) =>{
 
 export const updateInvoice = async (invoice : InvoiceModel) => {
     let message : string = '';
-    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices/` + invoice.id,{
-        method: 'PUT',
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices/${invoice.id}` ,{
+        method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },

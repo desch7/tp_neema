@@ -1,25 +1,14 @@
-import InvoiceModel from "../models/InvoiceModel.tsx"
+import InvoiceModel from "../models/InvoiceModel.ts"
 
-export const controlFields = (newRows : InvoiceModel[], invoice : InvoiceModel) => {
+export const controlFields = (invoice : InvoiceModel, rows? : any[]) => {
     let goodInvoice : string= 'OK'
-    if (newRows.filter(row =>row.tmcClientNumber === invoice.tmcClientNumber).length > 0) {
-        goodInvoice = 'Fields TMC Client Number is already in use. Must be unique'
-        
+    if (invoice.idCustomer === null || invoice.idCustomer === -1) {
+        goodInvoice = 'Customer Account must be provided'
         return goodInvoice
-    }
-    if (newRows.filter(row =>row.terms === invoice.terms).length > 0) {
-        goodInvoice = 'Fields Terms is already in use. Must be unique'
+      }
+    if (rows?.length === 0) {
+        goodInvoice = 'You must choose at least one travel items'
         
-        return goodInvoice
-    }
-    if (newRows.filter(row =>row.alias === invoice.alias).length > 0) {
-        goodInvoice = 'Fields Alias is already in use. Must be unique'
-        
-        return goodInvoice
-    }
-    if (newRows.filter(row =>row.abKey === invoice.abKey).length > 0) {
-        goodInvoice = 'Fields Ab Key is already in use. Must be unique'
-
         return goodInvoice
     }
 
