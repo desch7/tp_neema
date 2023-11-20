@@ -18,7 +18,7 @@ export const findAllInvoice = async ({page, pageSize}) =>  {
     return allInvoice;
 }
 
-export const selectInvoice = async (invoiceId) => {
+export const findInvoiceById = async (invoiceId) => {
     let Invoice : any = {};
 
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices/${invoiceId}`)

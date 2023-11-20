@@ -44,7 +44,7 @@ const PaymentForms = (props) => {
                 </div>
                 <div className='w-80 ml-3'>
                     <Select id='paymentMode' required={true} label='Payment Mode' 
-                      errors={props.errors} register={props.register} 
+                      errors={props.errors} register={props.register} onChangeSelect={props.onChangeSelectPay}
                       optionsList={props.listOptpayMode}
                     />
                 </div>

@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createInvoice, selectInvoice, updateInvoice } from '../../../../_service/invoice_service.ts';
+import { createInvoice, findInvoiceById, updateInvoice } from '../../../../_service/invoice_service.ts';
 import { controlFields } from '../../../../_Utils/InvoiceFieldsController.ts';
 import InvoiceForms from './InvoiceForms.tsx';
 import {
@@ -26,28 +26,20 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
 
     const columns: GridColDef[] = [
         { 
-          field: "invoice_number",  headerName: "Invoice Number", 
-          width: 200, align: 'left', headerAlign: 'left', 
+          field: "ticketNumber",  headerName: "Ticket Number", 
+          width: 300, align: 'left', headerAlign: 'left', 
         },
         { 
-          field: "creationDate",  headerName: "Creation Date", 
-          width: 150, align: 'left', headerAlign: 'left', 
+          field: "travelerName",  headerName: "Travel Name", 
+          width: 300, align: 'left', headerAlign: 'left', 
         },
         {
-          field: "dueDate", headerName: "Due Date", 
-          width: 150, align: 'left', headerAlign: 'left',
+          field: "itinerary", headerName: "Itinerary", 
+          width: 300, align: 'left', headerAlign: 'left',
         },
         {
-          field: "amount", headerName: "Amount",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "balance", headerName: "Balance",
-          width: 170, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "credit_apply", headerName: "Apply Credit",
-          width: 150, align: 'left', headerAlign: 'left',
+          field: "totalPrice", headerName: "Total Price",
+          width: 300, align: 'left', headerAlign: 'left',
         },
     
       ];
@@ -55,14 +47,10 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
       const fakeRows = [  
         {
           id:0,
-          invoice_number: "INV-001", //string (generated from backend)
-          idCustomer:0, //integer
-          creationDate:"2022-09-09", // date in this format
-          dueDate:"2022-10-19", //date in this format,
-          amount:10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
-          status:"", //string
-          balance:0.00, //float
-          credit_apply:0.00, //float
+          ticketNumber: "TCK-001", 
+          travelerName:"Travel 1", 
+          itinerary:"BE-CA", 
+          totalPrice:10000.00, 
         }
       ]
       const [rowSelectionModel, setRowSelectionModel] = useState<
@@ -112,7 +100,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
 
         }else{
             //insert invoice
-            console.log('data.IdCustomer ', data.IdCustomer);
+          data.IdCustomer = custId
             
             if (crtlFields !== 'OK' ) {
               toast.error(crtlFields,
@@ -126,7 +114,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
         let travelItemsSelected = travelItemsRows.filter(travelItem => rowSelectionModel.includes(travelItem.id))
          data.travelItems = travelItemsSelected;
           
-        console.log(JSON.stringify(data))
+        console.log('In insert =>',JSON.stringify(data))
 
             createInvoice(data)
             .then((response) => {
@@ -145,7 +133,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
     };
 
     const onChangeSelect = (e) => {
-      //console.log('Onchange launched ', e.target.value);
+      console.log('Onchange launched ', e.target.value);
       setCustId(e.target.value)
   } 
 
@@ -155,7 +143,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess}) {
             setListOptCustomer(CreationSelectionList({rows: data, value : 'id', label : 'customerName'}))
         )
         if (invoiceId) {
-           selectInvoice(invoiceId).then(invoice => setInvoice(invoice))
+           findInvoiceById(invoiceId).then(invoice => setInvoice(invoice))
             setValue("idCustomer", invoice?.idCustomer)
             setValue("dueDate", invoice?.dueDate)                   
         }

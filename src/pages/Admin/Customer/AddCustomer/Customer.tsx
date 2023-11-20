@@ -4,16 +4,17 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createCustomer, updateCustomer } from '../../../../_service/customer_service.ts';
+import { createCustomer, findCustomerById, updateCustomer } from '../../../../_service/customer_service.ts';
 import CustomerForms from './CustomerForms.tsx';
-import { controlFields } from '../../../../_Utils/CustomerFieldsController.ts';
+import CustomerModel from '../../../../models/CustomerModel.tsx';
 
 
 
-export default function Customer({ onNotifmodal, customer, rows, msgSuccess}) {
+export default function Customer({ onNotifmodal, customerId, msgSuccess}) {
 
    const [modal, setModal] = useState(true)
    const [loading, setLoading] = useState(false)
+   const [customer, setCustomer] = useState<CustomerModel>()
 
   const handleClose = () => { 
     setModal(false)
@@ -39,25 +40,12 @@ const listOptLang: optionsLanguage[] = [
     const { register, handleSubmit, setValue, formState:{ errors }} = useForm();
 
     const onSubmit =  (data:any) => {
-        setLoading(true)
-        data.idCurrency = 272
-        data.slug = parseInt(data.slug)
-        data.terms = parseInt(data.terms)
         data.idCountry = 2
-        data.isActive = false
-        data.isSubAgency = data.isSubAgency? data.isSubAgency : false;
+        //data.idCurrency = 272
+        setLoading(true)
         console.log(JSON.stringify(data))
-        if (customer) {
+        if (customerId) {
             // Update customer
-            const newRows = rows.filter(row =>row.id !== customer.id)
-            const fieldsCheck = controlFields(newRows, data)
-            if (fieldsCheck !== 'OK') {
-                toast.error(fieldsCheck,
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
             updateCustomer(data)
             .then((response) => {
                 if (response === 'OK') {  
@@ -73,14 +61,6 @@ const listOptLang: optionsLanguage[] = [
 
         }else{
             //insert customer
-            const fieldsCheck = controlFields(rows, data)
-            if (fieldsCheck !== 'OK') {
-                toast.error(fieldsCheck,
-                    {position: toast.POSITION.TOP_CENTER})
-                
-                setLoading(false)
-                return
-            }
             createCustomer(data)
             .then((response) => {
                 if (response === 'OK') {  
@@ -98,24 +78,15 @@ const listOptLang: optionsLanguage[] = [
     };
 
     useEffect(() => {
-        if (customer) {
-            setValue("customerName", customer.customerName)
-            setValue("street", customer.street)            
-            setValue("city", customer.city)
-            setValue("state", customer.state)
-            setValue("zipCode", customer.zipCode)
-            setValue("notes", customer.notes)
-            setValue("terms", customer.terms)
-            setValue("accountNumber", customer.accountNumber)
-            setValue("isSubAgency", customer.isSubAgency)
-            setValue("language", customer.language)
-            setValue("slug", customer.slug)
-            setValue("agency", customer.agency)
-            setValue("alias", customer.alias)
-            setValue("abKey", customer.abKey)
-            setValue("tmcClientNumber", customer.tmcClientNumber)           
+        if (customerId) {
+            findCustomerById(customerId).then((customer) => setCustomer(customer))
+            setValue("customerName", customer?.customerName)
+            setValue("state", customer?.state)
+            setValue("accountNumber", customer?.accountNumber)
+            setValue("alias", customer?.alias)
+            setValue("tmcClientNumber", customer?.tmcClientNumber)           
         }
-    }, [customer])
+    }, [customerId])
 
 
   return (

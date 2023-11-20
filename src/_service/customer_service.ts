@@ -1,6 +1,6 @@
 import CustomerModel from "../models/CustomerModel.ts"
 
-export const findAllCustomer = async (pageInfo ?: any ) =>  {
+export const findAllCustomer = async (pageInfo?:any) =>  {
     let allCustomer : CustomerModel[] = [];
 
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers?page=${pageInfo?.page}&page-size=${pageInfo?.pageSize}`)
@@ -17,9 +17,25 @@ export const findAllCustomer = async (pageInfo ?: any ) =>  {
 }
 
 
+export const findCustomerById = async (customerId : any) =>  {
+    let customer ;
+
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/${customerId}`)
+        .then(res => res.json())
+        .then(data =>{
+            customer = data
+            console.log('customer by id => ',customer)
+        })
+        .catch(err => {
+            console.log('error fetch customer by id=> ',err)
+        })
+
+    return customer;
+}
+
 export  const deleteCustomer = async (idCustomer: number) =>{
     let message : string = '';
-    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/` + idCustomer,
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/${idCustomer}`,
         {
             method: 'DELETE',
         }
@@ -39,8 +55,8 @@ export  const deleteCustomer = async (idCustomer: number) =>{
 
 export const updateCustomer = async (customer : CustomerModel) => {
     let message : string = '';
-    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/` + customer.id,{
-        method: 'PUT',
+    await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/${customer.id}`,{
+        method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },

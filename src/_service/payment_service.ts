@@ -81,7 +81,7 @@ export const createPayment = async (payments : PaymentModel) => {
     return message
 }
 
-export const selectPayment = async (paymentId : number) => {
+export const findPaymentById = async (paymentId : number) => {
     let payment : any = {}
     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments/${paymentId}`)
     .then(res => res.json())

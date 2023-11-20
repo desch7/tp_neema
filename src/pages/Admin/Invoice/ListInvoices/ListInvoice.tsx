@@ -62,7 +62,7 @@ const ListInvoice = () => {
               <GridActionsCellItem
                 icon={<PaymentIcon />}
                 label="Imputation"
-                //onClick={deleteCustomer(id)}
+                //onClick={Imputation(id)}
                 color="inherit"
               />
               </div>
@@ -94,15 +94,19 @@ const ListInvoice = () => {
       const [openModal, setOpenModal] = useState(false);
       const [openModalDelete, setOpenModalDelete] = useState(false);
       const [idInvoiceToDel, setIdInvoiceToDel] = useState();
-      const [invoice, setInvoice] = useState<any>(null);
+      const [invoiceId, setInvoiceId] = useState<any>(null);
+
+      const Imputation = (id?: any) => {
+        
+      }
     
       const displayModal = () => {
           setOpenModal(true);
       }
     
       const displayModalUpdate = (id: any) => () => {
-        const cust = rows.filter((row) => row.id === parseInt(id))[0]
-        setInvoice(cust)
+        
+        setInvoiceId(id)
         setOpenModal(true);
       }
     
@@ -114,7 +118,7 @@ const ListInvoice = () => {
       const onNotifmodal = (msg : boolean)=>{
         setOpenModal(msg)
         setOpenModalDelete(msg)
-        setInvoice(null)
+        setInvoiceId(null)
       }
     
       const msgSuccess = (msg: string) => {
@@ -156,7 +160,7 @@ const ListInvoice = () => {
       {openModal && (
         <div>
           <Invoice 
-            onNotifmodal={onNotifmodal}  invoice={invoice}  
+            onNotifmodal={onNotifmodal}  invoiceId={invoiceId}  
             msgSuccess={msgSuccess}  rows={rows}
           />
         </div>

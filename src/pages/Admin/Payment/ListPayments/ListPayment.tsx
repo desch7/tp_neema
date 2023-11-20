@@ -88,6 +88,7 @@ const ListPayment = () => {
       const [paymentId, setPaymentId] = useState<any>(null);
     
       const displayModal = () => {
+        
           setOpenModal(true);
       }
     

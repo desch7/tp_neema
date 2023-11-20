@@ -1,7 +1,6 @@
 import {
     GridRowSelectionModel, GridColDef, GridActionsCellItem,
   } from "@mui/x-data-grid";
-import React from 'react';
 import {useEffect, useState} from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -9,10 +8,27 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { findAllCustomer } from "../../../../_service/customer_service.ts";
 import CustomerModel from "../../../../models/CustomerModel.ts";
-import DataTable from "./ListCustomerForm.tsx";
+import DataTable from '../../../../Components/DataTable.tsx';
+import AddIcon from '@mui/icons-material/Add';
+import React from 'react';
+import Button from '@mui/material/Button';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Customer from '../AddCustomer/Customer.tsx';
+import DeleteCustomer from '../DeleteCustomer/DeleteCustomer.tsx';
 
 
 const ListCustomer = () => {
+
+   const fakeRows = [{
+    id: 0,    
+    customerName : 'Customer',
+    accountNumber : '123',
+    state : 'cameroun',
+    tmcClientNumber : '123',
+
+
+   }]
 
     const columns: GridColDef[] = [
         { 
@@ -21,15 +37,11 @@ const ListCustomer = () => {
         },
         { 
           field: "accountNumber",  headerName: "Account Number", 
-          width: 150, align: 'left', headerAlign: 'left', 
+          width: 250, align: 'left', headerAlign: 'left', 
         },
         {
           field: "state", headerName: "State",
-          width: 200, align: 'left', headerAlign: 'left',
-        },
-        {
-          field: "agency", headerName: "Agency",
-          width: 170, align: 'left', headerAlign: 'left',
+          width: 250, align: 'left', headerAlign: 'left',
         },
         {
           field: "tmcClientNumber", headerName: "TMC Client Number",
@@ -60,15 +72,19 @@ const ListCustomer = () => {
       const [openModal, setOpenModal] = useState(false);
       const [openModalDelete, setOpenModalDelete] = useState(false);
       const [idCustomerToDel, setIdCustomerToDel] = useState();
-      const [customer, setCustomer] = useState<any>(null);
+      const [customerId, setCustomerId] = useState<any>(null);
+      const [paginationModel, setPaginationModel] = useState({
+        page: 0,
+        pageSize: 25,
+      });
     
       const displayModal = () => {
           setOpenModal(true);
       }
     
       const displayModalUpdate = (id: any) => () => {
-        const cust = rows.filter((row) => row.id === parseInt(id))[0]
-        setCustomer(cust)
+        
+        setCustomerId(id)
         setOpenModal(true);
       }
     
@@ -80,7 +96,7 @@ const ListCustomer = () => {
       const onNotifmodal = (msg : boolean)=>{
         setOpenModal(msg)
         setOpenModalDelete(msg)
-        setCustomer(null)
+        setCustomerId(null)
       }
     
       const msgSuccess = (msg: string) => {
@@ -91,19 +107,58 @@ const ListCustomer = () => {
       }
     
       useEffect(() => {
-        findAllCustomer().then(data => setRows(data))
+        findAllCustomer(paginationModel).then(data => setRows(data))
       }, [relaodData]);
     
       return (
-        <DataTable 
-          openModal={openModal} onNotifmodal={onNotifmodal} 
-          customer={customer}  msgSuccess={msgSuccess} 
-          rows={rows} idCustomerToDel = {idCustomerToDel}
-          displayModal={displayModal} columns={columns} 
-          rowSelectionModel={rowSelectionModel}
-          openModalDelete={openModalDelete} 
-          setRowSelectionModel={setRowSelectionModel}
-        />
+        <div className="p-4">
+          <ToastContainer />
+          {openModal && (
+            <div>
+              <Customer 
+                onNotifmodal={onNotifmodal}  customerId={customerId}  
+                msgSuccess={msgSuccess} 
+              />
+            </div>
+          )}
+
+          {openModalDelete && (
+            <div>
+              <DeleteCustomer 
+                onNotifmodal={onNotifmodal} 
+                idCustomer = {idCustomerToDel}  
+                msgSuccess={msgSuccess}
+              />
+            </div>
+          )}
+
+          <h3 className="flex justify-center text-2x font-bold mb-3">
+            CUSTOMER LIST
+          </h3>
+          <div className="w-1/6">
+            <Button color="primary" variant= "outlined" 
+              startIcon={<AddIcon />} onClick={displayModal}
+            >
+              Add CUSTOMER
+            </Button>
+          </div>
+          <div className="mt-2" style={{ height: 525, width: '100%' }}>
+            <DataTable
+              rows={fakeRows}
+              columns={columns}
+              //rowCount={rowCount}
+              //loading={loading}
+              rowSelectionModel={rowSelectionModel}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              //rowCount={rowCountState}
+              //loading={isLoading}
+              checkboxSelection = {false}
+              rowHeight={30}
+              setRowSelectionModel = {setRowSelectionModel}
+            />
+          </div>
+        </div>
       );
 }
 

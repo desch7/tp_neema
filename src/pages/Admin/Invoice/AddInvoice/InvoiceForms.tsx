@@ -32,7 +32,7 @@ const InvoiceForms = (props) => {
               <div className='flex justify-around'>
                 <div className='w-80'>
                     <Select id='idCustomer' errors={props.errors} 
-                      required={true} register={props.register} 
+                      required={true} register={props.register} onChangeSelect={props.onChangeSelect}
                       label='Customer Account' optionsList={props.listOptCustomer} 
                     />
                     

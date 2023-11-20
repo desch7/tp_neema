@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createPayment, selectPayment, updatePayment } from '../../../../_service/payment_service.ts';
+import { createPayment, findPaymentById, updatePayment } from '../../../../_service/payment_service.ts';
 import PaymentForms from './PaymentForms.tsx';
 import {
     GridRowSelectionModel, GridColDef, GridActionsCellItem,
@@ -57,6 +57,8 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess}) {
     page: 0,
     pageSize: 25,
   });
+  const [custId, setCustId] = useState<number>()
+  const [paymentMode, setPaymentMode] = useState<string>()
 
   const handleClose = () => { 
     setModal(false)
@@ -93,6 +95,8 @@ const [listOptCustomer, setListOptCustomer] = useState<optionsSelectCus[]>([])
     const { register, handleSubmit, setValue, formState:{ errors }} = useForm();
 
     const onSubmit =  (data:any) => {
+      data.idCustomer = custId
+      data.paymentMode = paymentMode
         setLoading(true)
         console.log(JSON.stringify(data))
         if (paymentId) {
@@ -147,9 +151,15 @@ const [listOptCustomer, setListOptCustomer] = useState<optionsSelectCus[]>([])
     // Load Invoice depending on customer
     const onChangeSelect = (e) => {
         console.log('Onchange launched ', e.target.value);
+        setCustId(e.target.value)
         findAllInvoiceByCustomer(paginationModel, e.target.value)
         .then(data => setInvoiceByCustomer(data))
     } 
+
+    const onChangeSelectPay = (e) => {
+      console.log('Onchange launched ', e.target.value);
+      setPaymentMode(e.target.value)
+  }
  
     useEffect(() => {
         findAllCustomer()
@@ -160,7 +170,7 @@ const [listOptCustomer, setListOptCustomer] = useState<optionsSelectCus[]>([])
         // Automatic feed fields of payment
         if (paymentId) {
             // select payment by id
-            selectPayment(paymentId).then(payment => setPayment(payment))
+            findPaymentById(paymentId).then(payment => setPayment(payment))
             setValue("idCustomer", payment?.idCustomer)
             setValue("amount", payment?.amount)            
             setValue("paymentMode", payment?.paymentMode) 
@@ -191,7 +201,7 @@ const [listOptCustomer, setListOptCustomer] = useState<optionsSelectCus[]>([])
       handleSubmit={handleSubmit} errors={errors}
       onSubmit={onSubmit} register = {register}
       listOptCustomer={listOptCustomer} loading={loading} 
-      payment={payment} columns={columns}
+      payment={payment} columns={columns} onChangeSelectPay={onChangeSelectPay}
       checkboxSelection = {false} rows={fakeRows} onChangeSelect={onChangeSelect}
       setRowSelectionModel = {setRowSelectionModel} listOptpayMode={listOptpayMode}
     />
