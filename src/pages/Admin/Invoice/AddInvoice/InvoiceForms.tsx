@@ -18,55 +18,61 @@ import DataTable from '../../../../Components/DataTable.tsx';
 const InvoiceForms = (props) => {
   return (
     <div>
-     <ToastContainer />
+      <ToastContainer />
       <Dialog
-      fullScreen
+        fullScreen
         open={props.modal}
         onClose={props.handleClose}
       >
         <DialogTitle className='flex justify-center bg-slate-100'>
           New Invoice
         </DialogTitle>
-        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>       
-            <DialogContent className=''>
-              <div className='flex justify-around'>
-                <div className='w-80'>
-                    <Select id='idCustomer' errors={props.errors} 
-                      required={true} register={props.register} onChangeSelect={props.onChangeSelect}
-                      label='Customer Account' optionsList={props.listOptCustomer} 
-                    />
-                    
-                </div>
-                <div className='w-80'>
-                    <Input id='dueDate'  
-                      errors={props.errors} required={true} label='Due Date'  
-                      register={props.register} type='date'
-                    />
-                </div>
-              </div>
+        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>
+          <DialogContent className=''>
+            <div className='flex justify-around'>
+              <div className='w-80 mr-3'>
+                <Select id='idCustomer' errors={props.errors}
+                  required={true} register={props.register} onChangeSelect={props.onChangeSelect}
+                  label='Customer Account' optionsList={props.listOptCustomer}
+                />
 
-              <div className="mt-5 ml-16 mb-4" style={{ height: 430, width: '91%' }}>
+              </div>
+              <div className='w-80 ml-3 mr-3'>
+                <Input id='dueDate'
+                  errors={props.errors} required={true} label='Due Date'
+                  register={props.register} type='date'
+                />
+              </div>
+              <div className='w-80 ml-3'>
+                <Input id='creationDate'
+                  errors={props.errors} required={true} label='Creation Date'
+                  register={props.register} type='date'
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 ml-16 mb-4" style={{ height: 430, width: '91%' }}>
               Add Travel Items
-               <DataTable
-                 rows={props.rows}
-                 columns={props.columns}
-                 //rowCount={rowCount}
-                 //loading={loading}
-                 rowSelectionModel={props.rowSelectionModel}
-                 paginationModel={props.paginationModel}
-                 onPaginationModelChange={props.setPaginationModel}
-                 //rowCount={rowCountState}
-                 //loading={isLoading}
-                 checkboxSelection = {props.checkboxSelection}
-                 setRowSelectionModel = {props.setRowSelectionModel}
-                 rowHeight={30}
-               />
-              </div> 
-            </DialogContent>
-            <div className='flex justify-center bg-slate-100'>         
-              <DialogActions className=''>
-                <div className='mr-10'>
-                  <LoadingButton
+              <DataTable
+                rows={props.rows}
+                columns={props.columns}
+                //rowCount={rowCount}
+                //loading={loading}
+                rowSelectionModel={props.rowSelectionModel}
+                paginationModel={props.paginationModel}
+                onPaginationModelChange={props.setPaginationModel}
+                //rowCount={rowCountState}
+                //loading={isLoading}
+                checkboxSelection={props.checkboxSelection}
+                setRowSelectionModel={props.setRowSelectionModel}
+                rowHeight={30}
+              />
+            </div>
+          </DialogContent>
+          <div className='flex justify-center bg-slate-100'>
+            <DialogActions className=''>
+              <div className='mr-10'>
+                <LoadingButton
                   size="small"
                   color="success"
                   loading={props.loading}
@@ -74,23 +80,23 @@ const InvoiceForms = (props) => {
                   startIcon={<SaveIcon />}
                   variant="outlined"
                   type="submit"
-                  >
-                  <span>{props.invoice? 'Update' : 'Save'}</span>
-                  </LoadingButton>
-                </div>
-                <Button 
-                size="small" 
+                >
+                  <span>{props.invoice ? 'Update' : 'Save'}</span>
+                </LoadingButton>
+              </div>
+              <Button
+                size="small"
                 color="error"
                 variant="outlined"
-                startIcon={<CancelIcon />} 
+                startIcon={<CancelIcon />}
                 onClick={props.handleClose}
-                >
+              >
                 Cancel
-                </Button>
-              </DialogActions>
-            </div>
+              </Button>
+            </DialogActions>
+          </div>
         </form>
-      </Dialog> 
+      </Dialog>
     </div>
   );
 }
