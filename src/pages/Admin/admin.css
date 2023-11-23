@@ -1,9 +1,11 @@
 #admin {
     display: flex;
+    width: 100%;
+    height: 100%;
 }
 
-.SideMenu{
-    flex-grow: 1;
+/* .SideMenu{
+    width: 10%;
     border-right: solid 1px grey;    
     margin-left: 20px;
     padding-top: 20px;
@@ -11,10 +13,9 @@
 }
 
 #admin_body{
-    flex-grow: 6;
     padding-left: 15px;
 }
-
+ */
 .AHeader{
     text-align: center;
     line-height: 50px;
@@ -51,3 +52,22 @@
     background-color: grey;
 }
 
+.SideB{
+    width: 15%;
+    border-right: solid 1px grey;    
+    margin-left: 20px;
+    padding-top: 20px;
+    margin-right: 0px;
+    height: 100%;
+}
+.AdminBody{
+    height: 100%;
+    width: 85%;
+    border-right: solid 1px grey;
+    padding-left: 3rem;
+    padding-top: 20px;
+}
+
+.w-screen {
+    width: 100%;
+}

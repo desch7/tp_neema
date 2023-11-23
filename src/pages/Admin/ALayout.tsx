@@ -11,8 +11,10 @@ const ALayout = () => {
         <div className='ALayout'>
             <Header/>
             <div id="admin">
-                <SideMenu/>
-                <div id='admin_body'>
+                <div className='SideB'>
+                    <SideMenu/>
+                </div>
+                <div className='AdminBody'>  
                     <Outlet/>
                 </div>
             </div>

@@ -20,7 +20,7 @@ const InvoiceForms = (props) => {
       <ToastContainer />
       <Dialog maxWidth="lg" open={props.modal} onClose={props.handleClose}>
         <div>
-          <DialogTitle>Appliquer des Drédits à </DialogTitle>
+          <DialogTitle>New Invoice</DialogTitle>
           <form
             onSubmit={props.handleSubmit(props.onSubmit)}
             className="mt-0 w-screen"
