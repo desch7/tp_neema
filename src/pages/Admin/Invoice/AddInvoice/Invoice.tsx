@@ -19,8 +19,14 @@ import { findAllCustomer } from "../../../../_service/customer_service.ts";
 import { CreationSelectionList } from "../../../../_Utils/CreationSelectionList.ts";
 import InvoiceModel from "../../../../models/InvoiceModel.ts";
 import TravelItems from "../../../../models/TravelItems.ts";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
+export default function Invoice() {
+  let params = useParams();
+  let onNotifmodal: any;
+  let invoiceId = Number(params.uid);
+  let msgSuccess: any;
+  let navigate = useNavigate();
   interface optionsSelect {
     label: string;
     value: number;
@@ -76,8 +82,9 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
   const [custId, setCustId] = useState<number>();
 
   const handleClose = () => {
-    setModal(false);
-    onNotifmodal(false);
+    /* setModal(false)
+    onNotifmodal(false) */
+    navigate("/admin/invoices");
   };
 
   const {
