@@ -1,0 +1,11 @@
+.diag {
+    min-height: 50rem;
+    overflow-y: none;
+}
+
+.bor{
+    padding: 0px;
+    margin: 0px;
+    max-width: 100% !important;
+    min-width: 100% !important;
+}

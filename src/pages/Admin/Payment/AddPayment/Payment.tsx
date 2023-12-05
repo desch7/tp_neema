@@ -197,7 +197,7 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
 
   return (
     <PaymentForms
-      modal={modal} handleClose={handleClose}
+      modal={modal} handleClose={handleClose} paymentId={paymentId}
       handleSubmit={handleSubmit} errors={errors}
       onSubmit={onSubmit} register={register}
       listOptCustomer={listOptCustomer} loading={loading}

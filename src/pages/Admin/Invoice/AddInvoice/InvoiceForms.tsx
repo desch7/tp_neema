@@ -20,14 +20,15 @@ const InvoiceForms = (props) => {
     <div>
       <ToastContainer />
       <Dialog
-        fullScreen
+        maxWidth="xl"
+
         open={props.modal}
         onClose={props.handleClose}
       >
-        <DialogTitle className='flex justify-center bg-slate-100'>
-          New Invoice
+        <DialogTitle className='flex justify-center h-10 bg-slate-100'>
+          <span className='text-base font-black'>{props.invoiceId ? 'Edit Invoice' : 'New Invoice'}</span>
         </DialogTitle>
-        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>
+        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-full'>
           <DialogContent className=''>
             <div className='flex justify-around'>
               <div className='w-80 mr-3'>
@@ -51,16 +52,16 @@ const InvoiceForms = (props) => {
               </div>
             </div>
 
-            <div className="mt-5 ml-16 mb-4" style={{ height: 430, width: '91%' }}>
-              Add Travel Items
+            <div className="mt-2 ml-16 mb-4" style={{ height: 400, width: '91%' }}>
+              <span className='text-base'>Add Travel Items</span>
               <DataTable
                 rows={props.rows}
                 columns={props.columns}
-                //rowCount={rowCount}
-                //loading={loading}
+                rowCount={props.rowCount}
+                loading={props.loading}
                 rowSelectionModel={props.rowSelectionModel}
                 paginationModel={props.paginationModel}
-                onPaginationModelChange={props.setPaginationModel}
+                onPaginationModelChange={props.onPaginationModelChange}
                 //rowCount={rowCountState}
                 //loading={isLoading}
                 checkboxSelection={props.checkboxSelection}
@@ -69,7 +70,7 @@ const InvoiceForms = (props) => {
               />
             </div>
           </DialogContent>
-          <div className='flex justify-center bg-slate-100'>
+          <div className='flex justify-center'>
             <DialogActions className=''>
               <div className='mr-10'>
                 <LoadingButton
@@ -81,7 +82,7 @@ const InvoiceForms = (props) => {
                   variant="outlined"
                   type="submit"
                 >
-                  <span>{props.invoice ? 'Update' : 'Save'}</span>
+                  <span>{props.invoiceId ? 'Update' : 'Save'}</span>
                 </LoadingButton>
               </div>
               <Button

@@ -20,14 +20,14 @@ const PaymentForms = (props) => {
     <div>
       <ToastContainer />
       <Dialog
-        fullScreen
+        maxWidth="xl"
         open={props.modal}
         onClose={props.handleClose}
       >
-        <DialogTitle className='flex justify-center bg-slate-100'>
-          {props.payment ? 'Edit Payment' : 'New Payment'}
+        <DialogTitle className='flex justify-center h-10 bg-slate-100'>
+          <span className='text-base font-black'>{props.paymentId ? 'Edit Payment' : 'New Payment'}</span>
         </DialogTitle>
-        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-screen'>
+        <form onSubmit={props.handleSubmit(props.onSubmit)} className='mt-0 w-full'>
           <DialogContent>
             <div className='flex justify-around'>
               <div className='w-80 mr-3'>
@@ -50,7 +50,7 @@ const PaymentForms = (props) => {
               </div>
             </div>
 
-            <div className="mt-5 ml-16 mb-4" style={{ height: 430, width: '91%' }}>
+            <div className="mt-2 ml-16 mb-4" style={{ height: 400, width: '91%' }}>
               Invoices
               <DataTable
                 rows={props.rows}
@@ -68,7 +68,7 @@ const PaymentForms = (props) => {
               />
             </div>
           </DialogContent>
-          <div className='flex justify-center bg-slate-100'>
+          <div className='flex justify-center'>
             <DialogActions>
               <div className='mr-10'>
                 <LoadingButton
@@ -80,7 +80,7 @@ const PaymentForms = (props) => {
                   variant="outlined"
                   type="submit"
                 >
-                  <span>{props.payment ? 'Update' : 'Save'}</span>
+                  <span>{props.paymentId ? 'Update' : 'Save'}</span>
                 </LoadingButton>
               </div>
               <Button

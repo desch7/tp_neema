@@ -1,0 +1,9 @@
+.css-78c6dr-MuiToolbar-root-MuiTablePagination-toolbar .MuiTablePagination-actions {
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin-right: 40px;
+    margin-left: 0px;
+    display: flex;
+    width: 24px;
+}
