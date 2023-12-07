@@ -48,12 +48,12 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
 
   // const fakeRows = [
   //   {
-  //     id: 0,
-  //     ticketNumber: "TCK-001",
-  //     travelerName: "Travel 1",
-  //     itinerary: "BE-CA",
-  //     totalPrice: 10000.00,
-  //   }
+  //     id: 1,
+  //     ticketNumber: "TCK-001her93338ir0j",
+  //     travelerName: "Travel 1 skdhbks ffkbgkoggbosagdg",
+  //     itinerary: "BE-CAmh rjgo5oj[qwor3 irgege",
+  //     totalPrice: 10000454544400,
+  //   },
   // ]
   const [rowSelectionModel, setRowSelectionModel] = useState<
     GridRowSelectionModel
@@ -84,6 +84,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
 
   const onSubmit = (data: any) => {
     data.idCustomer = custId
+    data.idCustomer = parseInt(data.idCustomer)
     setLoading(true)
     let crtlFields = controlFields(data, rowSelectionModel)
     if (invoiceId) {
@@ -112,7 +113,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     } else {
       //insert invoice
       data.idCustomer = custId
-
+      data.idCustomer = parseInt(data.idCustomer)
       if (crtlFields !== 'OK') {
         toast.error(crtlFields,
           { position: toast.POSITION.TOP_CENTER })
@@ -211,7 +212,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
         handleSubmit={handleSubmit} errors={errors}
         onSubmit={onSubmit} register={register}
         loading={loading} rowCount={rowCountState}
-        listOptCustomer={listOptCustomer} rows={travelItemsRows}
+        listOptCustomer={listOptCustomer} rows={travelItemsRows}  /*fakeRows*/
         invoice={invoice} columns={columns} checkboxSelection={true}
         setRowSelectionModel={setRowSelectionModel} onChangeSelect={onChangeSelect}
         onPaginationModelChange={handlePaginationChange} paginationModel={paginationModel}

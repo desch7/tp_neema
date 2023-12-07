@@ -1,5 +1,5 @@
 import {
-  GridRowSelectionModel, GridColDef, GridActionsCellItem,
+  GridRowSelectionModel, GridColDef, GridActionsCellItem, GridPaginationModel,
 } from "@mui/x-data-grid";
 import React from 'react';
 import { useEffect, useState } from "react";
@@ -68,16 +68,16 @@ const ListPayment = () => {
       }
     }
   ];
+  const [loading, setLoading] = useState(false)
+
+  /*to handle pagiantion */
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
   });
-  // request for pagination from backend
-  //const { isLoading, rows, totalRowCount } = useQuery(paginationModel);
 
-  // const [rowCountState, setRowCountState] = useState(
-  //   totalRowCount || 0,
-  // );
+  const [rowCountState, setRowCountState] = useState(0);
+  /*to handle pagiantion */
   const [rows, setRows] = useState<PaymentModel[]>([])
   const [rowSelectionModel, setRowSelectionModel] = useState<
     GridRowSelectionModel>([]);
@@ -116,31 +116,62 @@ const ListPayment = () => {
     setRelaodData(!relaodData)
   }
 
+  /*to handle pagiantion */
+  const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
+    console.log('Pagination changed before:', paginationModel)
+    setPaginationModel(newPaginationModel);
+    console.log('Pagination changed after:', paginationModel)
+    console.log('Pagination changed variable direct:', newPaginationModel)
+    setLoading(true)
+
+    findAllPayment(newPaginationModel)
+      .then(resp => {
+        if (resp?.data?.length > 0 && resp?.data?.length) {
+          setRows(resp.data)
+          setRowCountState((prevRowCountState) =>
+            rowCountState !== undefined
+              ? resp.totalRowCount
+              : prevRowCountState,
+          )
+        }
+        setLoading(false)
+      })
+
+  }
+  /*to handle pagiantion */
+
   useEffect(() => {
-    findAllPayment(paginationModel).then(res => setRows(res))
+
+    /*to handle pagiantion */
+    setLoading(true)
+    findAllPayment(paginationModel)
+      .then(resp => {
+        if (resp?.data?.length > 0 && resp?.data?.length) {
+          setRows(resp.data)
+          setRowCountState((prevRowCountState) =>
+            rowCountState !== undefined
+              ? resp.totalRowCount
+              : prevRowCountState,
+          )
+        }
+        setLoading(false)
+      })
+    /*to handle pagiantion */
   }, [relaodData]);
 
-  // useEffect(() => {
-  //   setRowCountState((prevRowCountState) =>
-  //     totalRowCount !== undefined
-  //       ? totalRowCount
-  //       : prevRowCountState,
-  //   );
-  // }, [totalRowCount, setRowCountState]);
-
-  const fakeRows = [
-    {
-      id: 1,
-      paymentNumber: "PER-001", //string (generated from backend)
-      idCustomer: 0, //integer
-      paymentDate: "2022-09-09", // date in this format
-      paymentMode: "cash", //date in this format,
-      amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
-      balance: 0.00, //string
-      usedAmount: 0.00, //float
-      status: "open", //float
-    }
-  ]
+  // const fakeRows = [
+  //   {
+  //     id: 1,
+  //     paymentNumber: "PER-001", //string (generated from backend)
+  //     idCustomer: 0, //integer
+  //     paymentDate: "2022-09-09", // date in this format
+  //     paymentMode: "cash", //date in this format,
+  //     amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
+  //     balance: 0.00, //string
+  //     usedAmount: 0.00, //float
+  //     status: "open", //float
+  //   }
+  // ]
 
   return (
     <div className="p-4">
@@ -176,15 +207,13 @@ const ListPayment = () => {
       </div>
       <div className="mt-2" style={{ height: 525, width: '100%' }}>
         <DataTable
-          rows={fakeRows}
+          rows={rows}
           columns={columns}
-          //rowCount={rowCount}
-          //loading={loading}
+          rowCount={rowCountState}
+          loading={loading}
           rowSelectionModel={rowSelectionModel}
+          onPaginationModelChange={handlePaginationChange}
           paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          //rowCount={rowCountState}
-          //loading={isLoading}
           checkboxSelection={false}
           rowHeight={30}
           setRowSelectionModel={setRowSelectionModel}

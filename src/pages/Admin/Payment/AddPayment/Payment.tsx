@@ -15,6 +15,7 @@ import { CreationSelectionList } from '../../../../_Utils/CreationSelectionList.
 import PaymentModel from '../../../../models/PaymentModel.ts';
 import InvoiceModel from '../../../../models/InvoiceModel.ts';
 import { findAllInvoiceByCustomer } from '../../../../_service/invoice_service.ts';
+import { ctrlpaymentFields } from '../../../../_Utils/PaymentFieldsController.ts';
 
 
 
@@ -22,7 +23,7 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
 
   const columns: GridColDef[] = [
     {
-      field: "invoice_number", headerName: "Invoice Number",
+      field: "invoiceNumber", headerName: "Invoice Number",
       width: 180, align: 'left', headerAlign: 'left',
     },
     {
@@ -52,7 +53,7 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
   const [modal, setModal] = useState(true)
   const [loading, setLoading] = useState(false)
   const [payment, setPayment] = useState<PaymentModel>()
-  const [invoiceByCustomer, setInvoiceByCustomer] = useState<InvoiceModel[]>([])
+  const [invoicesByCustomer, setInvoicesByCustomer] = useState<InvoiceModel[]>([])
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
@@ -77,6 +78,10 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
 
   const listOptpayMode: optionsSelect[] = [
     {
+      label: 'Choose a payment mode',
+      value: '-1'
+    },
+    {
       label: 'cash',
       value: 'cash'
     },
@@ -96,19 +101,23 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
 
   const onSubmit = (data: any) => {
     data.idCustomer = custId
+    data.idCustomer = parseInt(data.idCustomer)
+    data.amount = parseFloat(data.amount)
     data.paymentMode = paymentMode
     setLoading(true)
-    console.log(JSON.stringify(data))
+    console.log('data payment =>', JSON.stringify(data))
+    const goodData = ctrlpaymentFields(data)
+
+    if (goodData !== 'OK') {
+      toast.error(goodData,
+        { position: toast.POSITION.TOP_CENTER })
+
+      setLoading(false)
+      return
+    }
+
     if (paymentId) {
       // Update payment
-
-      if (data.idCustomer === '') {
-        toast.error('Customer Account must be provided',
-          { position: toast.POSITION.TOP_CENTER })
-
-        setLoading(false)
-        return
-      }
       updatePayment(data)
         .then((response) => {
           if (response === 'OK') {
@@ -124,13 +133,6 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
 
     } else {
       //insert payment
-      if (data.IdCustomer === 'Nothing') {
-        // toast.error('Choose a customer',
-        //     {position: toast.POSITION.TOP_CENTER})
-
-        setLoading(false)
-        return
-      }
       console.log(data)
       createPayment(data)
         .then((response) => {
@@ -151,9 +153,11 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
   // Load Invoice depending on customer
   const onChangeSelect = (e) => {
     console.log('Onchange launched ', e.target.value);
-    setCustId(e.target.value)
-    findAllInvoiceByCustomer(paginationModel, e.target.value)
-      .then(data => setInvoiceByCustomer(data))
+    if (parseInt(e.target.value) > -1) {
+      setCustId(e.target.value)
+      findAllInvoiceByCustomer(parseInt(e.target.value))
+        .then(data => setInvoicesByCustomer(data))
+    }
   }
 
   const onChangeSelectPay = (e) => {
@@ -176,24 +180,24 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
       setValue("paymentMode", payment?.paymentMode)
 
       // // Load Invoice depending on customer
-      findAllInvoiceByCustomer(paginationModel, payment?.idCustomer)
-        .then(data => setInvoiceByCustomer(data))
+      findAllInvoiceByCustomer(payment?.idCustomer)
+        .then(data => setInvoicesByCustomer(data))
     }
 
-  }, [paymentId])
-  const fakeRows = [
-    {
-      id: 0,
-      invoice_number: "INV-001", //string (generated from backend)
-      idCustomer: 0, //integer
-      creationDate: "2022-09-09", // date in this format
-      dueDate: "2022-10-19", //date in this format,
-      amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
-      status: "", //string
-      balance: 0.00, //float
-      credit_apply: 0.00, //float
-    }
-  ]
+  }, [])
+  // const fakeRows = [
+  //   {
+  //     id: 0,
+  //     invoice_number: "INV-001", //string (generated from backend)
+  //     idCustomer: 0, //integer
+  //     creationDate: "2022-09-09", // date in this format
+  //     dueDate: "2022-10-19", //date in this format,
+  //     amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
+  //     status: "", //string
+  //     balance: 0.00, //float
+  //     credit_apply: 0.00, //float
+  //   }
+  // ]
 
   return (
     <PaymentForms
@@ -202,7 +206,7 @@ export default function Payment({ onNotifmodal, paymentId, msgSuccess }) {
       onSubmit={onSubmit} register={register}
       listOptCustomer={listOptCustomer} loading={loading}
       payment={payment} columns={columns} onChangeSelectPay={onChangeSelectPay}
-      checkboxSelection={false} rows={fakeRows} onChangeSelect={onChangeSelect}
+      checkboxSelection={false} rows={invoicesByCustomer} onChangeSelect={onChangeSelect}
       setRowSelectionModel={setRowSelectionModel} listOptpayMode={listOptpayMode}
     />
   );

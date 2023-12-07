@@ -1,5 +1,5 @@
 import {
-  GridRowSelectionModel, GridColDef, GridActionsCellItem,
+  GridRowSelectionModel, GridColDef, GridActionsCellItem, GridPaginationModel,
 } from "@mui/x-data-grid";
 import React from 'react';
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ const ListInvoice = () => {
 
   const columns: GridColDef[] = [
     {
-      field: "invoice_number", headerName: "Invoice Number",
+      field: "invoiceNumber", headerName: "Invoice Number",
       width: 200, align: 'left', headerAlign: 'left',
     },
     {
@@ -78,16 +78,17 @@ const ListInvoice = () => {
       }
     }
   ];
+
+  const [loading, setLoading] = useState(false)
+
+  /*to handle pagiantion */
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
   });
-  // request for pagination from backend
-  //const { isLoading, rows, totalRowCount } = useQuery(paginationModel);
 
-  // const [rowCountState, setRowCountState] = useState(
-  //   totalRowCount || 0,
-  // );
+  const [rowCountState, setRowCountState] = useState(0);
+  /*to handle pagiantion */
   const [rows, setRows] = useState<InvoiceModel[]>([])
   const [rowSelectionModel, setRowSelectionModel] = useState<
     GridRowSelectionModel>([]);
@@ -97,8 +98,12 @@ const ListInvoice = () => {
   const [idInvoiceToDel, setIdInvoiceToDel] = useState();
   const [invoiceId, setInvoiceId] = useState<any>(null);
   const [openImputation, setOpenImputation] = useState(false);
+  const [nameInv, setNameInv] = useState<string>('');
 
   const ImputationInv = (id: any) => () => {
+    let invRow = rows.filter(item => item.id === id);
+    setNameInv(invRow[0].invoiceNumber)
+    setInvoiceId(id)
     setOpenImputation(true)
   }
 
@@ -122,6 +127,7 @@ const ListInvoice = () => {
     setOpenModalDelete(msg)
     setOpenImputation(msg)
     setInvoiceId(null)
+    setRelaodData(!relaodData)
   }
 
   const msgSuccess = (msg: string) => {
@@ -131,31 +137,64 @@ const ListInvoice = () => {
     setRelaodData(!relaodData)
   }
 
+  /*to handle pagiantion */
+  const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
+    console.log('Pagination changed before:', paginationModel)
+    setPaginationModel(newPaginationModel);
+    console.log('Pagination changed after:', paginationModel)
+    console.log('Pagination changed variable direct:', newPaginationModel)
+    setLoading(true)
+
+    findAllInvoice(newPaginationModel)
+      .then(resp => {
+        if (resp?.data?.length > 0 && resp?.data?.length) {
+          setRows(resp.data)
+          setRowCountState((prevRowCountState) =>
+            rowCountState !== undefined
+              ? resp.totalRowCount
+              : prevRowCountState,
+          )
+        }
+        setLoading(false)
+      })
+
+  }
+  /*to handle pagiantion */
+
   useEffect(() => {
-    findAllInvoice(paginationModel).then(data => setRows(data))
+    /*to handle pagiantion */
+    setLoading(true)
+    findAllInvoice(paginationModel)
+      .then(resp => {
+        if (resp?.data?.length > 0 && resp?.data?.length) {
+          setRows(resp.data)
+          setRowCountState((prevRowCountState) =>
+            rowCountState !== undefined
+              ? resp.totalRowCount
+              : prevRowCountState,
+          )
+        }
+        setLoading(false)
+      })
+    /*to handle pagiantion */
+
+
   }, [relaodData]);
 
-  // useEffect(() => {
-  //   setRowCountState((prevRowCountState) =>
-  //     totalRowCount !== undefined
-  //       ? totalRowCount
-  //       : prevRowCountState,
-  //   );
-  // }, [totalRowCount, setRowCountState]);
 
-  const fakeRows = [
-    {
-      id: 1,
-      invoice_number: "INV-001", //string (generated from backend)
-      idCustomer: 0, //integer
-      creationDate: "2022-09-09", // date in this format
-      dueDate: "2022-10-19", //date in this format,
-      amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
-      status: "", //string
-      balance: 0.00, //float
-      credit_apply: 0.00, //float
-    }
-  ]
+  // const fakeRows = [
+  //   {
+  //     id: 1,
+  //     invoice_number: "INV-001", //string (generated from backend)
+  //     idCustomer: 0, //integer
+  //     creationDate: "2022-09-09", // date in this format
+  //     dueDate: "2022-10-19", //date in this format,
+  //     amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
+  //     status: "", //string
+  //     balance: 0.00, //float
+  //     credit_apply: 0.00, //float
+  //   }
+  // ]
 
   return (
     <div className="p-4">
@@ -183,6 +222,8 @@ const ListInvoice = () => {
         <div>
           <Imputation
             onNotifmodal={onNotifmodal}
+            invoiceId={invoiceId}
+            nameInv={nameInv}
           />
         </div>
       )}
@@ -200,15 +241,13 @@ const ListInvoice = () => {
 
       <div className="mt-2" style={{ height: 525, width: '100%' }}>
         <DataTable
-          rows={fakeRows}
+          rows={rows}
           columns={columns}
-          //rowCount={rowCount}
-          //loading={loading}
+          rowCount={rowCountState}
+          loading={loading}
           rowSelectionModel={rowSelectionModel}
+          onPaginationModelChange={handlePaginationChange}
           paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          //rowCount={rowCountState}
-          //loading={isLoading}
           checkboxSelection={false}
           rowHeight={30}
           setRowSelectionModel={setRowSelectionModel}

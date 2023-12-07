@@ -2,13 +2,22 @@
 
 import InvoiceModel from "../models/InvoiceModel.ts";
 
+type donnee = {
+    data: InvoiceModel[],
+    totalRowCount : number,
+}
+
 export const findAllInvoice = async ({page, pageSize}) =>  {
-    let allInvoice : InvoiceModel[] = [];
+    let allInvoice: donnee = {
+        data: [],
+        totalRowCount: 0,
+    };
 
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices?page=${page}&page-size=${pageSize}`)
         .then(res => res.json())
         .then(resp =>{
-            allInvoice = resp.data
+            allInvoice.data = resp.data
+            allInvoice.totalRowCount = resp.totalRowCount
             console.log('allInvoice => ',allInvoice)
         })
         .catch(err => {
@@ -25,22 +34,22 @@ export const findInvoiceById = async (invoiceId) => {
         .then(res => res.json())
         .then(resp =>{
             Invoice = resp
-            console.log('allInvoice => ',Invoice)
+            console.log('Invoice by id=> ',Invoice)
         })
         .catch(err => {
-            console.log('error fetch invoice=> ',err)
+            console.log('error fetch invoice by id=> ',err)
         })
 
     return Invoice;
 }
 
-export const findAllInvoiceByCustomer = async ({page, pageSize}, idCustomer) =>  {
+export const findAllInvoiceByCustomer = async (idCustomer, pageInfo?) =>  {
     let allInvoice : any[] = [];
-
-     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices?embed=${idCustomer}&page=${page}&page-size=${pageSize}`)
+    const url = pageInfo ? `?page=${pageInfo?.page}&page-size=${pageInfo?.pageSize}` : '';
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers/${idCustomer}/invoices${url}`)
         .then(res => res.json())
         .then(resp =>{
-            allInvoice = resp.data
+            allInvoice = resp.data.Invoices
             console.log('all Invoice by customer=> ',allInvoice)
         })
         .catch(err => {
@@ -94,7 +103,9 @@ export const updateInvoice = async (invoice : InvoiceModel) => {
 
 
 export const createInvoice = async (invoices : InvoiceModel) => {
-    let message : string = ''
+    let message: string = ''
+    console.log('JSON.stringify(invoices) =>', JSON.stringify(invoices));
+    
     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices`,{
         method: 'POST',
         headers: {
@@ -102,8 +113,10 @@ export const createInvoice = async (invoices : InvoiceModel) => {
         },
         body: JSON.stringify(invoices),
     })
-    .then((response) => {
+        .then((response) => {
+        console.log('response in invoice .then service=> ',response)
         if (response.ok) {
+            
             message = 'OK'
         }
          })

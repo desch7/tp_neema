@@ -2,7 +2,7 @@ import TravelItems from "./TravelItems.ts"
 
 type InvoiceModel = {
     id : number,
-    invoice_number : string,
+    invoiceNumber : string,
     idCustomer : number,           
     creationDate : string,
     dueDate : string,

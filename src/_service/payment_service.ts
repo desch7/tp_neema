@@ -1,12 +1,21 @@
 import PaymentModel from "../models/PaymentModel.ts"
 
+type donnee = {
+    data: PaymentModel[],
+    totalRowCount : number,
+}
+
 export const findAllPayment = async ({page, pageSize}) =>  {
-    let allPayment : PaymentModel[] = [];
+    let allPayment : donnee = {
+        data: [],
+        totalRowCount: 0,
+    };
 
      await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/payments?page=${page}&page-size=${pageSize}`)
         .then(res => res.json())
         .then(resp =>{
-            allPayment = resp.data
+            allPayment.data = resp.data
+            allPayment.totalRowCount = resp.totalRowCount
             console.log('allPayment => ',allPayment)
         })
         .catch(err => {
