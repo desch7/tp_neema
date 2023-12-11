@@ -118,10 +118,13 @@ const Imputation = ({ onNotifmodal, invoiceId, nameInv }) => {
         let tab: ImptutationModif[] = []
         let nbreInput = imputation ? imputation?.imputations.length : 0
         for (let i = 0; i < nbreInput; i++) {
-            let oldValueToApply = ImputationForm.current[i].attributes[4].nodeValue
             let newValueToApply = ImputationForm.current[i].value
+            // get placeholder of input when ref is used in form tag directly
+            let oldValueToApply = ImputationForm.current[i].attributes[4].nodeValue
+            // get id of input when ref is used in form tag directly
+            let payIdInInput = ImputationForm.current[i].attributes[1].nodeValue
             if (oldValueToApply !== newValueToApply && newValueToApply !== '') {
-                let paymentId = parseInt(ImputationForm.current[i].attributes[1].nodeValue.toString().split('-payId')[1])
+                let paymentId = parseInt(payIdInInput.toString().split('-payId')[1])
                 let amountApp = parseFloat(newValueToApply)
                 tab.push({ idPayment: paymentId, amountApplied: amountApp })
             }
@@ -214,7 +217,7 @@ const Imputation = ({ onNotifmodal, invoiceId, nameInv }) => {
                                                             <td className="px-5 py-1">{item.payment.paymentNumber}</td>
                                                             <td className="px-5 py-1">{item.payment.paymentDate}</td>
                                                             <td className="px-5 py-1">{item.payment.amount}</td>
-                                                            <td className="px-5 py-1">{item.payment.balance + item.amountApplied}</td>
+                                                            <td className="px-5 py-1">{item.payment.balance}</td>
                                                             <td className="px-5 py-1">
                                                                 <input type="number"
                                                                     id={`amountApplied-payId${item.payment.id}`}
