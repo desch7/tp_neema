@@ -1,83 +1,124 @@
 import {
   GridRowSelectionModel, GridColDef, GridActionsCellItem, GridPaginationModel,
 } from "@mui/x-data-grid";
-import React from 'react';
+import React, { useRef } from 'react';
 import { useEffect, useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { findAllInvoice } from "../../../../_service/invoice_service.ts";
 import InvoiceModel from "../../../../models/InvoiceModel.tsx";
-import PaymentIcon from '@mui/icons-material/Payment';
-import AddIcon from '@mui/icons-material/Add';
-import Button from '@mui/material/Button';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Invoice from '../AddInvoice/Invoice.tsx';
 import Imputation from '../Imputation/Imputation.tsx';
 import DeleteInvoice from '../DeleteInvoice/DeleteInvoice.tsx';
-import DataTable from '../../../../Components/DataTable.tsx';
+import DatasTable from "../../../../Components/DatasTable/DatasTable.tsx";
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import { useSelector } from "react-redux";
+
 
 
 const ListInvoice = () => {
+  //store.dispatch(findAllInvoice())
+  /* necessaire pour le DataTable*/
+  const [eltSelected, setEltSelected] = useState<number[]>([])
+  const [checkedAll, setCheckedAll] = useState<boolean>(false)
 
-  const columns: GridColDef[] = [
-    {
-      field: "invoiceNumber", headerName: "Invoice Number",
-      width: 200, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "creationDate", headerName: "Creation Date",
-      width: 150, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "dueDate", headerName: "Due Date",
-      width: 150, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "amount", headerName: "Amount",
-      width: 170, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "balance", headerName: "Balance",
-      width: 170, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "credit_apply", headerName: "Apply Credit",
-      width: 150, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "actions", type: "actions", headerName: "Actions",
-      width: 150, cellClassName: "actions", align: 'center',
-      getActions: ({ id }) => {
-        return [
-          <div className="flex ">
-            <div className="w-12">
-              <GridActionsCellItem
-                icon={<EditIcon />} label="Edit" className="textPrimary"
-                onClick={displayModalUpdate(id)} color="inherit"
-              />
-            </div>
-            <div className="w-12">
-              <GridActionsCellItem
-                icon={<PaymentIcon />}
-                label="Imputation"
-                onClick={ImputationInv(id)}
-                color="inherit"
-              />
-            </div>
-            <div className="w-12">
-              <GridActionsCellItem
-                icon={<DeleteIcon />} label="Delete"
-                onClick={deleteInvoice(id)} color="inherit"
-              />
-            </div>
-          </div>
-        ];
-      }
+  const singleOnChange = (eltId) => {
+    let tab = eltSelected
+    //console.log((tab.filter(el => el === eltId)).length);
+
+    if ((tab.filter(el => el === eltId)).length > 0) {
+      tab = tab.filter(el => el !== eltId)
+    } else {
+      tab = [...tab, eltId]
     }
-  ];
+    let checkA = tab.length > 0 ? true : false
+    setCheckedAll(checkA)
+    setEltSelected(tab)
+    //console.log(tab);
+
+  }
+
+  const toggleAll = () => {
+    let tab: number[] = []
+    if (!checkedAll) {
+      tab = rows.map(el => el.id)
+    } else {
+      tab = []
+    }
+    //console.log('tab toggleAll', tab);
+    setCheckedAll(!checkedAll)
+    setEltSelected(tab)
+    // setSingleCheck(!checkedAll)
+  }
+  /* necessaire pour le DataTable*/
+
+  const headers = [
+    { value: 'invoiceNumber', label: 'Invoice Number' },
+    { value: 'dueDate', label: 'Due Date' },
+    { value: 'amount', label: 'Amount' },
+    { value: 'balance', label: 'Balance' },
+    { value: 'credit_apply', label: 'Apply Credit' },
+  ]
+
+
+  // const columns: GridColDef[] = [
+  //   {
+  //     field: "invoiceNumber", headerName: "Invoice Number",
+  //     width: 200, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "creationDate", headerName: "Creation Date",
+  //     width: 150, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "dueDate", headerName: "Due Date",
+  //     width: 150, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "amount", headerName: "Amount",
+  //     width: 170, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "balance", headerName: "Balance",
+  //     width: 170, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "credit_apply", headerName: "Apply Credit",
+  //     width: 150, align: 'left', headerAlign: 'left',
+  //   },
+  //   {
+  //     field: "actions", type: "actions", headerName: "Actions",
+  //     width: 150, cellClassName: "actions", align: 'center',
+  //     getActions: ({ id }) => {
+  //       return [
+  //         <div className="flex ">
+  //           <div className="w-12">
+  //             <GridActionsCellItem
+  //               icon={<EditIcon />} label="Edit" className="textPrimary"
+  //               onClick={displayModalUpdate(id)} color="inherit"
+  //             />
+  //           </div>
+  //           <div className="w-12">
+  //             <GridActionsCellItem
+  //               icon={<PaymentIcon />}
+  //               label="Imputation"
+  //               onClick={ImputationInv(id)}
+  //               color="inherit"
+  //             />
+  //           </div>
+  //           <div className="w-12">
+  //             <GridActionsCellItem
+  //               icon={<DeleteIcon />} label="Delete"
+  //               onClick={deleteInvoice(id)} color="inherit"
+  //             />
+  //           </div>
+  //         </div>
+  //       ];
+  //     }
+  //   }
+  // ];
 
   const [loading, setLoading] = useState(false)
 
@@ -90,8 +131,8 @@ const ListInvoice = () => {
   const [rowCountState, setRowCountState] = useState(0);
   /*to handle pagiantion */
   const [rows, setRows] = useState<InvoiceModel[]>([])
-  const [rowSelectionModel, setRowSelectionModel] = useState<
-    GridRowSelectionModel>([]);
+  // const [rowSelectionModel, setRowSelectionModel] = useState<
+  //   GridRowSelectionModel>([]);
   const [relaodData, setRelaodData] = useState(true)
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -160,44 +201,27 @@ const ListInvoice = () => {
 
   }
   /*to handle pagiantion */
+  const allInv = useSelector(state => state.invoiceReducer)
 
   useEffect(() => {
+
+    console.log('allInv =>>', allInv);
+
     /*to handle pagiantion */
     setLoading(true)
-    findAllInvoice(paginationModel)
-      .then(resp => {
-        if (resp?.data?.length > 0 && resp?.data?.length) {
-          setRows(resp.data)
-          setRowCountState((prevRowCountState) =>
-            rowCountState !== undefined
-              ? resp.totalRowCount
-              : prevRowCountState,
-          )
-        }
-        setLoading(false)
-      })
+    // if (allInv?.data?.length > 0 && allInv?.data?.length) {
+    //   setRows(allInv.data)
+    // }
+    setLoading(false)
+
     /*to handle pagiantion */
 
 
   }, [relaodData]);
 
 
-  // const fakeRows = [
-  //   {
-  //     id: 1,
-  //     invoice_number: "INV-001", //string (generated from backend)
-  //     idCustomer: 0, //integer
-  //     creationDate: "2022-09-09", // date in this format
-  //     dueDate: "2022-10-19", //date in this format,
-  //     amount: 10000.00, //float. ---> SUM of total price of all travel_item linked to invoice
-  //     status: "", //string
-  //     balance: 0.00, //float
-  //     credit_apply: 0.00, //float
-  //   }
-  // ]
-
   return (
-    <div className="p-4">
+    <div className="p-4 h-full">
       <ToastContainer />
       {openModal && (
         <div>
@@ -232,14 +256,17 @@ const ListInvoice = () => {
         INVOICES LIST
       </h3>
       <div className="w-1/6">
-        <Button color="primary" variant="outlined"
-          startIcon={<AddIcon />} onClick={displayModal}
+        <button
+          type="button"
+          className="rounded-md bg-white px-2.5 py-2 text-sm font-semibold text-blue-400 ml-4
+          shadow-sm ring-1 ring-inset ring-blue-400 hover:bg-blue-50"
+          onClick={displayModal}
         >
-          Add Invoice
-        </Button>
+          <AddOutlinedIcon /> ADD INVOICE
+        </button>
       </div>
 
-      <div className="mt-2" style={{ height: 525, width: '100%' }}>
+      {/* <div className="mt-2" style={{ height: 525, width: '100%' }}>
         <DataTable
           rows={rows}
           columns={columns}
@@ -251,6 +278,20 @@ const ListInvoice = () => {
           checkboxSelection={false}
           rowHeight={30}
           setRowSelectionModel={setRowSelectionModel}
+        />
+      </div> */}
+      <div className="mt-7">
+        <DatasTable
+          toggleAll={toggleAll}
+          checkedAll={checkedAll}
+          credit={true}
+          actions={true}
+          headers={headers}
+          content={allInv?.data}
+          singleOnChange={singleOnChange}
+          imputation={ImputationInv}
+          edit={displayModalUpdate}
+          loading={loading}
         />
       </div>
     </div>

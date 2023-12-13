@@ -6,18 +6,18 @@ import './admincomponents.css'
 
 const SideMenu = () => {
     let navigate = useNavigate()
-    const logout = () => { 
+    const logout = () => {
         accountService.logout()
         navigate('/auth/login')
     }
     return (
-        <div className='SideMenu'>
+        <div className='SideMenu h-screen'>
             <ul>
                 <li> <Link to="/admin/dashboard"> Dashboard </Link> </li>
                 <li> <Link to="/admin/customers"> Customers </Link> </li>
                 <li> <Link to="/admin/invoices"> Invoices </Link> </li>
                 <li> <Link to="/admin/payments"> Paiement receipt  </Link> </li>
-                <button onClick={logout}> Deconnexion </button> 
+                <button onClick={logout}> Deconnexion </button>
             </ul>
         </div>
     );

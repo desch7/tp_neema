@@ -16,6 +16,8 @@ import InvoiceModel from '../../../../models/InvoiceModel.ts';
 import TravelItems from '../../../../models/TravelItems.ts';
 import "./Invoice.css";
 import { findAllTravelItems } from '../../../../_service/travelItems_service.ts';
+import { useDispatch } from 'react-redux';
+//import { CREATEINVOICE, createInvoice } from '../../../../Actions/invoice.action.ts';
 
 
 
@@ -25,45 +27,74 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     label: string,
     value: number,
   }
-
-  const columns: GridColDef[] = [
-    {
-      field: "ticketNumber", headerName: "Ticket Number",
-      width: 150, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "travelerName", headerName: "Travel Name",
-      width: 350, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "itinerary", headerName: "Itinerary",
-      width: 250, align: 'left', headerAlign: 'left',
-    },
-    {
-      field: "totalPrice", headerName: "Total Price",
-      width: 250, align: 'left', headerAlign: 'left',
-    },
-
-  ];
-
+  const headers = [
+    { value: 'ticketNumber', label: 'Ticket Number' },
+    { value: 'travelerName', label: 'Travel Name' },
+    { value: 'itinerary', label: 'Itinerary' },
+    { value: 'totalPrice', label: 'Total Price' },
+  ]
   // const fakeRows = [
   //   {
   //     id: 1,
-  //     ticketNumber: "TCK-001her93338ir0j",
-  //     travelerName: "Travel 1 skdhbks ffkbgkoggbosagdg",
-  //     itinerary: "BE-CAmh rjgo5oj[qwor3 irgege",
-  //     totalPrice: 10000454544400,
+  //     ticketNumber: 'qwrewrewr',
+  //     travelerName: 'ncowmks',
+  //     itinerary: 'nxjwkeuwnodj',
+  //     totalPrice: 1622822
   //   },
+  //   {
+  //     id: 2,
+  //     ticketNumber: 'qwrewrewr',
+  //     travelerName: 'ncowmks',
+  //     itinerary: 'nxjwkeuwnodj',
+  //     totalPrice: 1622822
+  //   },
+  //   {
+  //     id: 3,
+  //     ticketNumber: 'qwrewrewr',
+  //     travelerName: 'ncowmks',
+  //     itinerary: 'nxjwkeuwnodj',
+  //     totalPrice: 1622822
+  //   }
   // ]
-  const [rowSelectionModel, setRowSelectionModel] = useState<
-    GridRowSelectionModel
-  >([]);
+  const [eltSelected, setEltSelected] = useState<number[]>([])
+  const [checkedAll, setCheckedAll] = useState<boolean>(false)
+
+  const singleOnChange = (eltId) => {
+    let tab = eltSelected
+    //console.log((tab.filter(el => el === eltId)).length);
+
+    if ((tab.filter(el => el === eltId)).length > 0) {
+      tab = tab.filter(el => el !== eltId)
+    } else {
+      tab = [...tab, eltId]
+    }
+    let checkA = tab.length > 0 ? true : false
+    setCheckedAll(checkA)
+    setEltSelected(tab)
+    //console.log(tab);
+
+  }
+
+  const toggleAll = () => {
+    let tab: number[] = []
+    if (!checkedAll) {
+      tab = rows.map(el => el.id)
+    } else {
+      tab = []
+    }
+    //console.log('tab toggleAll', tab);
+    setCheckedAll(!checkedAll)
+    setEltSelected(tab)
+    // setSingleCheck(!checkedAll)
+  }
+
   const [modal, setModal] = useState(true)
   const [loading, setLoading] = useState(false)
   const [listOptCustomer, setListOptCustomer] = useState<optionsSelect[]>([])
   const [invoice, setInvoice] = useState<InvoiceModel>()
   const [travelItemsRows, setTravelItemsRows] = useState<TravelItems[]>([])
   const [custId, setCustId] = useState<number>()
+  const dispatch = useDispatch()
 
   /*to handle pagiantion */
   const [paginationModel, setPaginationModel] = useState({
@@ -79,14 +110,13 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     onNotifmodal(false)
   }
 
-
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
   const onSubmit = (data: any) => {
     data.idCustomer = custId
     data.idCustomer = parseInt(data.idCustomer)
     setLoading(true)
-    let crtlFields = controlFields(data, rowSelectionModel)
+    let crtlFields = controlFields(data, eltSelected)
     if (invoiceId) {
       // Update invoice
       if (crtlFields !== 'OK') {
@@ -121,21 +151,20 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
         setLoading(false)
         return
       }
-      console.log('rowSelectionModel ', rowSelectionModel);
 
-      let travelItemsSelected = travelItemsRows.filter(travelItem => rowSelectionModel.includes(travelItem.id))
+      let travelItemsSelected = travelItemsRows.filter(travelItem => eltSelected.includes(travelItem.id))
       data.travelItems = travelItemsSelected;
 
       console.log('In insert =>', JSON.stringify(data))
-
+      //dispatch({ type: CREATEINVOICE }, createInvoice(data))
       createInvoice(data)
         .then((response) => {
-          if (response === 'OK') {
+          if (response?.status === 'OK') {
             msgSuccess('Invoice was created successfully')
             setModal(false)
             onNotifmodal(false)
           } else {
-            toast.error('The server is not available or something went wrong!',
+            toast.error(response?.msg,
               { position: toast.POSITION.TOP_CENTER })
             setLoading(false)
           }
@@ -150,27 +179,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
   }
 
   /*to handle pagiantion */
-  const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
-    console.log('Pagination changed before:', paginationModel)
-    setPaginationModel(newPaginationModel);
-    console.log('Pagination changed after:', paginationModel)
-    console.log('Pagination changed variable direct:', newPaginationModel)
-    setLoading(true)
 
-    findAllTravelItems(newPaginationModel)
-      .then(resp => {
-        if (resp?.data?.length > 0 && resp?.data?.length) {
-          setTravelItemsRows(resp.data)
-          setRowCountState((prevRowCountState) =>
-            rowCountState !== undefined
-              ? resp.totalRowCount
-              : prevRowCountState,
-          )
-        }
-        setLoading(false)
-      })
-
-  }
   /*to handle pagiantion */
 
   useEffect(() => {
@@ -182,7 +191,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
 
     /*to handle pagiantion */
     setLoading(true)
-    findAllTravelItems(paginationModel)
+    findAllTravelItems()
       .then(resp => {
         if (resp?.data?.length > 0 && resp?.data?.length) {
           setTravelItemsRows(resp.data)
@@ -208,14 +217,17 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
   return (
     <div>
       <InvoiceForms
+        toggleAll={toggleAll}
+        checkedAll={checkedAll}
+        headers={headers}
+        content={travelItemsRows}
+        singleOnChange={singleOnChange}
+        loading={loading}
         modal={modal} handleClose={handleClose} invoiceId={invoiceId}
         handleSubmit={handleSubmit} errors={errors}
         onSubmit={onSubmit} register={register}
-        loading={loading} rowCount={rowCountState}
-        listOptCustomer={listOptCustomer} rows={travelItemsRows}  /*fakeRows*/
-        invoice={invoice} columns={columns} checkboxSelection={true}
-        setRowSelectionModel={setRowSelectionModel} onChangeSelect={onChangeSelect}
-        onPaginationModelChange={handlePaginationChange} paginationModel={paginationModel}
+        listOptCustomer={listOptCustomer}  /*fakeRows*/
+        invoice={invoice} onChangeSelect={onChangeSelect}
       />
     </div>
 

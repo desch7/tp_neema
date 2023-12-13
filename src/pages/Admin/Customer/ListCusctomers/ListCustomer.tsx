@@ -116,7 +116,7 @@ const ListCustomer = () => {
   }, [relaodData]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 h-full">
       <ToastContainer />
       {openModal && (
         <div>
