@@ -103,7 +103,7 @@ export const updateInvoice = async (invoice : InvoiceModel) => {
 }
 
 
-export const createInvoice = async (invoices : InvoiceModel) => {
+export const createInvoices = async (invoices : InvoiceModel) => {
     console.log('JSON.stringify(invoices) =>', JSON.stringify(invoices));
     try {
         const result = await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/invoices`,{

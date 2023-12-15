@@ -2,10 +2,11 @@ import CustomerModel from "../models/CustomerModel.ts"
 
 export const findAllCustomer = async (pageInfo?:any) =>  {
     let allCustomer: CustomerModel[] = [];
-    const url = pageInfo ? `${process.env.REACT_APP_BASE_ENDPOINT}/customers?page=${pageInfo?.page}&page-size=${pageInfo?.pageSize}` : `${process.env.REACT_APP_BASE_ENDPOINT}/customers`
-    console.log('url in customer => ' + url);
+
+    const params = pageInfo ? `?page=${pageInfo.page}&page-size=${pageInfo.pageSize}` : ''
+    console.log('url in customer => ' + params);
     
-     await fetch(url)
+     await fetch(`${process.env.REACT_APP_BASE_ENDPOINT}/customers${params}`)
         .then(res => res.json())
         .then(data =>{
             allCustomer = data.data

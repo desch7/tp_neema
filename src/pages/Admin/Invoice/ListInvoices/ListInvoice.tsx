@@ -1,11 +1,7 @@
-import {
-  GridRowSelectionModel, GridColDef, GridActionsCellItem, GridPaginationModel,
-} from "@mui/x-data-grid";
-import React, { useRef } from 'react';
+import React from 'react';
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { findAllInvoice } from "../../../../_service/invoice_service.ts";
 import InvoiceModel from "../../../../models/InvoiceModel.tsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,12 +10,17 @@ import Imputation from '../Imputation/Imputation.tsx';
 import DeleteInvoice from '../DeleteInvoice/DeleteInvoice.tsx';
 import DatasTable from "../../../../Components/DatasTable/DatasTable.tsx";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { useSelector } from "react-redux";
+import { selectAllInvoices, InvoicesStatus, InvoicesError } from "../../../../Slice/invoiceSlice.js";
+import { findAllInvoices } from "../../../../Actions/invoice.action.ts";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks.ts";
 
 
 
 const ListInvoice = () => {
-  //store.dispatch(findAllInvoice())
+  const dispatch = useAppDispatch();
+  const allInv = useAppSelector(selectAllInvoices)
+  const allInvStatus = useAppSelector(InvoicesStatus)
+  const allInvError = useAppSelector(InvoicesError)
   /* necessaire pour le DataTable*/
   const [eltSelected, setEltSelected] = useState<number[]>([])
   const [checkedAll, setCheckedAll] = useState<boolean>(false)
@@ -43,7 +44,7 @@ const ListInvoice = () => {
   const toggleAll = () => {
     let tab: number[] = []
     if (!checkedAll) {
-      tab = rows.map(el => el.id)
+      tab = allInv?.data.map(el => el.id)
     } else {
       tab = []
     }
@@ -61,64 +62,6 @@ const ListInvoice = () => {
     { value: 'balance', label: 'Balance' },
     { value: 'credit_apply', label: 'Apply Credit' },
   ]
-
-
-  // const columns: GridColDef[] = [
-  //   {
-  //     field: "invoiceNumber", headerName: "Invoice Number",
-  //     width: 200, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "creationDate", headerName: "Creation Date",
-  //     width: 150, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "dueDate", headerName: "Due Date",
-  //     width: 150, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "amount", headerName: "Amount",
-  //     width: 170, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "balance", headerName: "Balance",
-  //     width: 170, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "credit_apply", headerName: "Apply Credit",
-  //     width: 150, align: 'left', headerAlign: 'left',
-  //   },
-  //   {
-  //     field: "actions", type: "actions", headerName: "Actions",
-  //     width: 150, cellClassName: "actions", align: 'center',
-  //     getActions: ({ id }) => {
-  //       return [
-  //         <div className="flex ">
-  //           <div className="w-12">
-  //             <GridActionsCellItem
-  //               icon={<EditIcon />} label="Edit" className="textPrimary"
-  //               onClick={displayModalUpdate(id)} color="inherit"
-  //             />
-  //           </div>
-  //           <div className="w-12">
-  //             <GridActionsCellItem
-  //               icon={<PaymentIcon />}
-  //               label="Imputation"
-  //               onClick={ImputationInv(id)}
-  //               color="inherit"
-  //             />
-  //           </div>
-  //           <div className="w-12">
-  //             <GridActionsCellItem
-  //               icon={<DeleteIcon />} label="Delete"
-  //               onClick={deleteInvoice(id)} color="inherit"
-  //             />
-  //           </div>
-  //         </div>
-  //       ];
-  //     }
-  //   }
-  // ];
 
   const [loading, setLoading] = useState(false)
 
@@ -142,7 +85,7 @@ const ListInvoice = () => {
   const [nameInv, setNameInv] = useState<string>('');
 
   const ImputationInv = (id: any) => () => {
-    let invRow = rows.filter(item => item.id === id);
+    let invRow = allInv?.data.filter(item => item.id === id);
     setNameInv(invRow[0].invoiceNumber)
     setInvoiceId(id)
     setOpenImputation(true)
@@ -178,46 +121,21 @@ const ListInvoice = () => {
     setRelaodData(!relaodData)
   }
 
-  /*to handle pagiantion */
-  const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
-    console.log('Pagination changed before:', paginationModel)
-    setPaginationModel(newPaginationModel);
-    console.log('Pagination changed after:', paginationModel)
-    console.log('Pagination changed variable direct:', newPaginationModel)
-    setLoading(true)
-
-    findAllInvoice(newPaginationModel)
-      .then(resp => {
-        if (resp?.data?.length > 0 && resp?.data?.length) {
-          setRows(resp.data)
-          setRowCountState((prevRowCountState) =>
-            rowCountState !== undefined
-              ? resp.totalRowCount
-              : prevRowCountState,
-          )
-        }
-        setLoading(false)
-      })
-
-  }
-  /*to handle pagiantion */
-  const allInv = useSelector(state => state.invoiceReducer)
-
   useEffect(() => {
-
+    if (allInvStatus === 'init') {
+      dispatch(findAllInvoices());
+    }
+    if (allInvStatus === 'loading') {
+      setLoading(true);
+    } else if (allInvStatus === 'succeeded') {
+      setLoading(false);
+    } else if (allInvStatus === 'failed') {
+      setLoading(true);
+    }
     console.log('allInv =>>', allInv);
 
-    /*to handle pagiantion */
-    setLoading(true)
-    // if (allInv?.data?.length > 0 && allInv?.data?.length) {
-    //   setRows(allInv.data)
-    // }
-    setLoading(false)
+  }, [dispatch, allInv]);
 
-    /*to handle pagiantion */
-
-
-  }, [relaodData]);
 
 
   return (
@@ -227,7 +145,7 @@ const ListInvoice = () => {
         <div>
           <Invoice
             onNotifmodal={onNotifmodal} invoiceId={invoiceId}
-            msgSuccess={msgSuccess} rows={rows}
+            msgSuccess={msgSuccess} rows={allInv?.data}
           />
         </div>
       )}
@@ -265,21 +183,6 @@ const ListInvoice = () => {
           <AddOutlinedIcon /> ADD INVOICE
         </button>
       </div>
-
-      {/* <div className="mt-2" style={{ height: 525, width: '100%' }}>
-        <DataTable
-          rows={rows}
-          columns={columns}
-          rowCount={rowCountState}
-          loading={loading}
-          rowSelectionModel={rowSelectionModel}
-          onPaginationModelChange={handlePaginationChange}
-          paginationModel={paginationModel}
-          checkboxSelection={false}
-          rowHeight={30}
-          setRowSelectionModel={setRowSelectionModel}
-        />
-      </div> */}
       <div className="mt-7">
         <DatasTable
           toggleAll={toggleAll}

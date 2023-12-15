@@ -4,24 +4,29 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { createInvoice, findInvoiceById, updateInvoice } from '../../../../_service/invoice_service.ts';
+import { findInvoiceById, updateInvoice } from '../../../../_service/invoice_service.ts';
 import { controlFields } from '../../../../_Utils/InvoiceFieldsController.ts';
 import InvoiceForms from './InvoiceForms.tsx';
-import {
-  GridRowSelectionModel, GridColDef, GridActionsCellItem, GridPaginationModel,
-} from "@mui/x-data-grid";
-import { findAllCustomer } from '../../../../_service/customer_service.ts';
 import { CreationSelectionList } from '../../../../_Utils/CreationSelectionList.ts';
 import InvoiceModel from '../../../../models/InvoiceModel.ts';
-import TravelItems from '../../../../models/TravelItems.ts';
 import "./Invoice.css";
-import { findAllTravelItems } from '../../../../_service/travelItems_service.ts';
-import { useDispatch } from 'react-redux';
-//import { CREATEINVOICE, createInvoice } from '../../../../Actions/invoice.action.ts';
+import { createInvoice } from '../../../../Actions/invoice.action.ts';
+import { useAppDispatch, useAppSelector } from '../../../../hooks/hooks.ts';
+import { InvoicesError } from '../../../../Slice/invoiceSlice.js';
+import { selectAllTravelItems, travelItemsStatus } from '../../../../Slice/travelItemsSlice.js';
+import { findAllTravelItems } from '../../../../Actions/travelItems.actions.ts';
+import { CustomersStatus, selectAllCustomers } from '../../../../Slice/customerSlice.js';
+import { findAllCustomers } from '../../../../Actions/customer.action.ts';
 
 
 
 export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
+  const dispatch = useAppDispatch();
+  const invError = useAppSelector(InvoicesError)
+  const allTravelItems = useAppSelector(selectAllTravelItems)
+  const trvlItemsStatus = useAppSelector(travelItemsStatus)
+  const allCustomers = useAppSelector(selectAllCustomers)
+  const customerStatus = useAppSelector(CustomersStatus)
 
   interface optionsSelect {
     label: string,
@@ -92,9 +97,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
   const [loading, setLoading] = useState(false)
   const [listOptCustomer, setListOptCustomer] = useState<optionsSelect[]>([])
   const [invoice, setInvoice] = useState<InvoiceModel>()
-  const [travelItemsRows, setTravelItemsRows] = useState<TravelItems[]>([])
   const [custId, setCustId] = useState<number>()
-  const dispatch = useDispatch()
 
   /*to handle pagiantion */
   const [paginationModel, setPaginationModel] = useState({
@@ -102,7 +105,6 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     pageSize: 25,
   });
 
-  const [rowCountState, setRowCountState] = useState(0);
   /*to handle pagiantion */
 
   const handleClose = () => {
@@ -152,23 +154,23 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
         return
       }
 
-      let travelItemsSelected = travelItemsRows.filter(travelItem => eltSelected.includes(travelItem.id))
+      let travelItemsSelected = allTravelItems.data.filter(travelItem => eltSelected.includes(travelItem.id))
       data.travelItems = travelItemsSelected;
 
       console.log('In insert =>', JSON.stringify(data))
-      //dispatch({ type: CREATEINVOICE }, createInvoice(data))
-      createInvoice(data)
-        .then((response) => {
-          if (response?.status === 'OK') {
-            msgSuccess('Invoice was created successfully')
-            setModal(false)
-            onNotifmodal(false)
-          } else {
-            toast.error(response?.msg,
-              { position: toast.POSITION.TOP_CENTER })
-            setLoading(false)
-          }
-        })
+      let response = dispatch(createInvoice(data))
+      console.log('response of dispatch in invoice creation => ', response);
+
+      if (invError !== undefined && invError !== '') {
+        toast.error(invError,
+          { position: toast.POSITION.TOP_CENTER })
+
+        setLoading(false)
+        return
+      }
+      msgSuccess('Invoice was created successfully')
+      setModal(false)
+      onNotifmodal(false)
     }
 
   };
@@ -178,32 +180,17 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     setCustId(e.target.value)
   }
 
-  /*to handle pagiantion */
-
-  /*to handle pagiantion */
 
   useEffect(() => {
 
-    findAllCustomer()
-      .then(data =>
-        setListOptCustomer(CreationSelectionList({ rows: data, value: 'id', label: 'customerName' }))
-      )
-
-    /*to handle pagiantion */
-    setLoading(true)
-    findAllTravelItems()
-      .then(resp => {
-        if (resp?.data?.length > 0 && resp?.data?.length) {
-          setTravelItemsRows(resp.data)
-          setRowCountState((prevRowCountState) =>
-            rowCountState !== undefined
-              ? resp.totalRowCount
-              : prevRowCountState,
-          )
-        }
-        setLoading(false)
-      })
-    /*to handle pagiantion */
+    console.log('All customers for create select list ', allCustomers);
+    if (customerStatus === 'init') {
+      dispatch(findAllCustomers())
+    }
+    if (customerStatus === 'succeeded') {
+      //set select list for customer
+      setListOptCustomer(CreationSelectionList({ rows: allCustomers?.data, value: 'id', label: 'customerName' }))
+    }
 
     if (invoiceId) {
       findInvoiceById(invoiceId).then(invoice => setInvoice(invoice))
@@ -211,7 +198,19 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
       setValue("dueDate", invoice?.dueDate)
     }
 
-  }, []);
+    if (trvlItemsStatus === 'init') {
+      dispatch(findAllTravelItems());
+    }
+    if (trvlItemsStatus === 'loading') {
+      setLoading(true);
+    } else if (trvlItemsStatus === 'succeeded') {
+      setLoading(false);
+    } else if (trvlItemsStatus === 'failed') {
+      setLoading(true);
+    }
+    console.log('allTravelItems =>>', allTravelItems);
+
+  }, [dispatch, allCustomers, allTravelItems]);
 
 
   return (
@@ -220,7 +219,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
         toggleAll={toggleAll}
         checkedAll={checkedAll}
         headers={headers}
-        content={travelItemsRows}
+        content={allTravelItems?.data}
         singleOnChange={singleOnChange}
         loading={loading}
         modal={modal} handleClose={handleClose} invoiceId={invoiceId}
