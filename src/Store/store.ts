@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit"
 import invoiceReducer from "../Slice/invoiceSlice.js"
 import  travelItemsReducer  from "../Slice/travelItemsSlice.js"
 import customerReducer from "../Slice/customerSlice.js"
+import imputationReducer from "../Slice/imputationSlice.js"
 
 
 const store = configureStore({
@@ -9,6 +10,7 @@ const store = configureStore({
     invoice: invoiceReducer,
     travelItems: travelItemsReducer,
     customer: customerReducer,
+    imputation: imputationReducer,
   },
   devTools: true,
 })

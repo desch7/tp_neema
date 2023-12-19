@@ -17,6 +17,7 @@ import { selectAllTravelItems, travelItemsStatus } from '../../../../Slice/trave
 import { findAllTravelItems } from '../../../../Actions/travelItems.actions.ts';
 import { CustomersStatus, selectAllCustomers } from '../../../../Slice/customerSlice.js';
 import { findAllCustomers } from '../../../../Actions/customer.action.ts';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 
 
@@ -158,19 +159,22 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
       data.travelItems = travelItemsSelected;
 
       console.log('In insert =>', JSON.stringify(data))
-      let response = dispatch(createInvoice(data))
-      console.log('response of dispatch in invoice creation => ', response);
+      dispatch(createInvoice(data))
+        .then(unwrapResult)
+        .then(res => {
+          if (res.status === 'KO') {
+            toast.error(res.msg,
+              { position: toast.POSITION.TOP_CENTER })
 
-      if (invError !== undefined && invError !== '') {
-        toast.error(invError,
-          { position: toast.POSITION.TOP_CENTER })
+            setLoading(false)
+            return
+          } else {
+            msgSuccess('Invoice was created successfully')
+            setModal(false)
+            onNotifmodal(false)
+          }
 
-        setLoading(false)
-        return
-      }
-      msgSuccess('Invoice was created successfully')
-      setModal(false)
-      onNotifmodal(false)
+        })
     }
 
   };
@@ -210,7 +214,7 @@ export default function Invoice({ onNotifmodal, invoiceId, rows, msgSuccess }) {
     }
     console.log('allTravelItems =>>', allTravelItems);
 
-  }, [dispatch, allCustomers, allTravelItems]);
+  }, [dispatch, allCustomers]);
 
 
   return (

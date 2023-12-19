@@ -13,6 +13,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { selectAllInvoices, InvoicesStatus, InvoicesError } from "../../../../Slice/invoiceSlice.js";
 import { findAllInvoices } from "../../../../Actions/invoice.action.ts";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/hooks.ts";
+import Notification from '../../../../Components/Notification.tsx';
 
 
 
@@ -140,6 +141,7 @@ const ListInvoice = () => {
 
   return (
     <div className="p-4 h-full">
+      <Notification />
       <ToastContainer />
       {openModal && (
         <div>

@@ -44,13 +44,13 @@ const DatasTable = (
                     <thead className=" z-10 top-0 sticky bg-slate-100 ">
                         <tr>
                             <th scope="col" className="relative px-7 sm:w-12 sm:px-6">
-                                <input
+                                {/* <input
                                     type="checkbox"
                                     className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-slate-600 focus:ring-slate-600"
                                     //ref={checkboxAll}
                                     checked={checkedAll}
                                     onChange={toggleAll}
-                                />
+                                /> */}
                             </th>
                             {headers?.map((head) => (
                                 <th scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-6">
